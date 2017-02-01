@@ -9,14 +9,12 @@
     <atom:link href="https://bazhenovc.github.io/blog/tags/direct3d-11/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>d3d11 dynamic vertex pulling</title>
+      <title>Dynamic vertex pulling with D3D11</title>
       <link>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</link>
       <pubDate>Thu, 02 Feb 2017 02:33:31 +0300</pubDate>
       
       <guid>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</guid>
       <description>
-
-&lt;h1 id=&#34;dynamic-vertex-pulling-with-d3d11&#34;&gt;Dynamic vertex pulling with D3D11&lt;/h1&gt;
 
 &lt;p&gt;This article is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&lt;/a&gt;&lt;/p&gt;
 
