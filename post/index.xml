@@ -55,6 +55,9 @@
 
 &lt;p&gt;&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png&lt;/a&gt;&lt;/p&gt;
 
+&lt;p&gt;| Physical buffer                              |
+| Logical buffer | Logical buffer | Logical buffer | Logical buffer |&lt;/p&gt;
+
 &lt;p&gt;In C++ this will look like this:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;struct DXLogicalMeshBuffer final
