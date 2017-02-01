@@ -48,6 +48,8 @@ These two terms are easily illustrated with the following picture:
 
 http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png
 
+| Physical buffer                              |
+| Logical buffer | Logical buffer | Logical buffer | Logical buffer |
 
 In C++ this will look like this:
 
