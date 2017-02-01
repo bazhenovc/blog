@@ -2,19 +2,52 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</loc>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://bazhenovc.github.io/blog/post/hello-world/</loc>
     <lastmod>2017-02-02T02:15:27+03:00</lastmod>
   </url>
   
   <url>
+    <loc>https://bazhenovc.github.io/blog/categories/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://bazhenovc.github.io/blog/tags/direct3d/</loc>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://bazhenovc.github.io/blog/tags/direct3d-11/</loc>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
     <loc>https://bazhenovc.github.io/blog/</loc>
-    <lastmod>2017-02-02T02:15:27+03:00</lastmod>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
     <loc>https://bazhenovc.github.io/blog/post/</loc>
-    <lastmod>2017-02-02T02:15:27+03:00</lastmod>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://bazhenovc.github.io/blog/categories/programming/</loc>
+    <lastmod>2017-02-02T02:33:31+03:00</lastmod>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>https://bazhenovc.github.io/blog/tags/</loc>
     <priority>0</priority>
   </url>
   

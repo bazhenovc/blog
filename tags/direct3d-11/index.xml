@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Posts on Kirill Bazhenov blog</title>
-    <link>https://bazhenovc.github.io/blog/post/index.xml</link>
-    <description>Recent content in Posts on Kirill Bazhenov blog</description>
+    <title>Direct3d 11 on Kirill Bazhenov blog</title>
+    <link>https://bazhenovc.github.io/blog/tags/direct3d-11/index.xml</link>
+    <description>Recent content in Direct3d 11 on Kirill Bazhenov blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 02 Feb 2017 02:33:31 +0300</lastBuildDate>
-    <atom:link href="https://bazhenovc.github.io/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://bazhenovc.github.io/blog/tags/direct3d-11/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>d3d11 dynamic vertex pulling</title>
@@ -466,20 +465,6 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 &lt;p&gt;&lt;a href=&#34;http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling&#34;&gt;OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos&lt;/a&gt; - almost the same method for OpenGL.&lt;/p&gt;
 
 &lt;p&gt;Thanks for your attention!&lt;/p&gt;
-</description>
-    </item>
-    
-    <item>
-      <title>hello world</title>
-      <link>https://bazhenovc.github.io/blog/post/hello-world/</link>
-      <pubDate>Thu, 02 Feb 2017 02:15:27 +0300</pubDate>
-      
-      <guid>https://bazhenovc.github.io/blog/post/hello-world/</guid>
-      <description>
-
-&lt;h1 id=&#34;hello-world&#34;&gt;Hello world&lt;/h1&gt;
-
-&lt;p&gt;Hello world!&lt;/p&gt;
 </description>
     </item>
     
