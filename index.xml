@@ -51,13 +51,6 @@
 
 &lt;p&gt;A logical buffer is a data structure that contains physical buffer offset and a data block size.&lt;/p&gt;
 
-&lt;p&gt;These two terms are easily illustrated with the following picture:&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;| Physical buffer                              |
-| Logical buffer | Logical buffer | Logical buffer | Logical buffer |&lt;/p&gt;
-
 &lt;p&gt;In C++ this will look like this:&lt;/p&gt;
 
 &lt;pre&gt;&lt;code&gt;struct DXLogicalMeshBuffer final
@@ -456,11 +449,11 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 &lt;p&gt;Here are some screenshots:
 16384 unique cubes, 1.2ms per frame on Intel HD 4400:&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;[](&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png&lt;/a&gt;)&lt;/p&gt;
 
 &lt;p&gt;4096 unique instances of grass, 200k triangles:&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;[](&lt;a href=&#34;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png&#34;&gt;http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png&lt;/a&gt;)&lt;/p&gt;
 
 &lt;h1 id=&#34;further-reading&#34;&gt;Further reading&lt;/h1&gt;
 
