@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kirill Bazhenov blog</title>
-    <link>http://example.org/index.xml</link>
-    <description>Recent content on Kirill Bazhenov blog</description>
+    <title>Posts on Kirill Bazhenov blog</title>
+    <link>http://example.org/post/index.xml</link>
+    <description>Recent content in Posts on Kirill Bazhenov blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 02 Feb 2017 02:15:27 +0300</lastBuildDate>
-    <atom:link href="http://example.org/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="http://example.org/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>hello world</title>
