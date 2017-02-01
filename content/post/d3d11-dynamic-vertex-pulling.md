@@ -44,13 +44,6 @@ A physical buffer is a GPU memory buffer which stores all indices and vertices o
 
 A logical buffer is a data structure that contains physical buffer offset and a data block size.
 
-These two terms are easily illustrated with the following picture:
-
-http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-60577500-1430146882_thumb.png
-
-| Physical buffer                              |
-| Logical buffer | Logical buffer | Logical buffer | Logical buffer |
-
 In C++ this will look like this:
 
 
@@ -434,12 +427,12 @@ The main source code for this method is [here](https://github.com/bazhenovc/sigr
 Here are some screenshots:
 16384 unique cubes, 1.2ms per frame on Intel HD 4400:
 
-http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png
+[](http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png)
 
 
 4096 unique instances of grass, 200k triangles:
 
-http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png
+[](http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png)
 
 # Further reading
 
