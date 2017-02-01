@@ -6,10 +6,9 @@ categories = [
   "Programming",
 ]
 tags = [ "Direct3D", "Direct3D 11" ]
-
 +++
 
-This article is crossposted from http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048
+This article is crossposted from [GameDev.net](http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048)
 
 # Motivation
 
