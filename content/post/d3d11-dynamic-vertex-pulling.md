@@ -1,6 +1,6 @@
 +++
 date = "2017-02-02T02:33:31+03:00"
-title = "d3d11 dynamic vertex pulling"
+title = "Dynamic vertex pulling with D3D11"
 draft = false
 categories = [
   "Programming",
@@ -8,9 +8,6 @@ categories = [
 tags = [ "Direct3D", "Direct3D 11" ]
 
 +++
-
-
-# Dynamic vertex pulling with D3D11
 
 This article is crossposted from http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048
 
