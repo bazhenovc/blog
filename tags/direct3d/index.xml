@@ -14,9 +14,9 @@
       <pubDate>Thu, 02 Feb 2017 02:33:31 +0300</pubDate>
       
       <guid>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</guid>
-      <description>
+      <description>&lt;p&gt;This is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;This article is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;/p&gt;
 
 &lt;h1 id=&#34;motivation&#34;&gt;Motivation&lt;/h1&gt;
 
@@ -462,8 +462,7 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 
 &lt;p&gt;&lt;a href=&#34;http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling&#34;&gt;OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos&lt;/a&gt; - almost the same method for OpenGL.&lt;/p&gt;
 
-&lt;p&gt;Thanks for your attention!&lt;/p&gt;
-</description>
+&lt;p&gt;Thanks for your attention!&lt;/p&gt;</description>
     </item>
     
   </channel>
