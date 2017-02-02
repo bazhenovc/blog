@@ -319,7 +319,7 @@
 &lt;p&gt;Here is the worst case when everything is visible and nothing is culled:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_forest.png&#34; alt=&#34;forest_view&#34; /&gt;
-&lt;img src=&#34;https://bazhenovc.github.io/blog/blog_lif_oc_forest_bounds.png&#34; alt=&#34;forest_bounds&#34; /&gt;&lt;/p&gt;
+&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_forest_bounds.png&#34; alt=&#34;forest_bounds&#34; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Here is the best case when only a small fraction is visible:&lt;/p&gt;
 
