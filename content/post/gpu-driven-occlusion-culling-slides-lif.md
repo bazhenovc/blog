@@ -275,9 +275,13 @@ And here's how it looks in practice:
 ## References
 
 [Intel SOC](https://software.intel.com/en-us/articles/software-occlusion-culling)
+
 [Secrets of CryEngine 3 graphics technology](http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology)
+
 [Mountains demo](http://rastergrid.com/blog/downloads/mountains-demo/)
+
 [OpenGL occlusion culling](https://github.com/nvpro-samples/gl_occlusion_culling)
+
 [SGFX Grass Demo](https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc)
 
 ## Bug
