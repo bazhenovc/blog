@@ -427,12 +427,12 @@ The main source code for this method is [here](https://github.com/bazhenovc/sigr
 Here are some screenshots:
 16384 unique cubes, 1.2ms per frame on Intel HD 4400:
 
-[](http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-11166200-1430147718_thumb.png)
+![cubes](dvp_cubes.png)
 
 
 4096 unique instances of grass, 200k triangles:
 
-[](http://www.gamedev.net/uploads/monthly_04_2015/ccs-182952-0-53156000-1430147719_thumb.png)
+![grass](dvp_grass.png)
 
 # Further reading
 
