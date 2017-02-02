@@ -440,3 +440,4 @@ Here are some screenshots:
 
 Thanks for your attention!
 
+{{ template "_internal/disqus.html" . }}
