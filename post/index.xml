@@ -403,11 +403,11 @@
 
 &lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&#34;https://software.intel.com/en-us/articles/software-occlusion-culling&#34;&gt;https://software.intel.com/en-us/articles/software-occlusion-culling&lt;/a&gt;
-&lt;a href=&#34;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&#34;&gt;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&lt;/a&gt;
-&lt;a href=&#34;http://rastergrid.com/blog/downloads/mountains-demo/&#34;&gt;http://rastergrid.com/blog/downloads/mountains-demo/&lt;/a&gt;
-&lt;a href=&#34;https://github.com/nvpro-samples/gl_occlusion_culling&#34;&gt;https://github.com/nvpro-samples/gl_occlusion_culling&lt;/a&gt;
-&lt;a href=&#34;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&#34;&gt;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://software.intel.com/en-us/articles/software-occlusion-culling&#34;&gt;Intel SOC&lt;/a&gt;
+&lt;a href=&#34;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&#34;&gt;Secrets of CryEngine 3 graphics technology&lt;/a&gt;
+&lt;a href=&#34;http://rastergrid.com/blog/downloads/mountains-demo/&#34;&gt;Mountains demo&lt;/a&gt;
+&lt;a href=&#34;https://github.com/nvpro-samples/gl_occlusion_culling&#34;&gt;OpenGL occlusion culling&lt;/a&gt;
+&lt;a href=&#34;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&#34;&gt;SGFX Grass Demo&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&#34;bug&#34;&gt;Bug&lt;/h2&gt;
 
