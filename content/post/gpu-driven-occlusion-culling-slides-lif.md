@@ -115,11 +115,11 @@ It is bad because:
 
 Here's a small comparison table for methods mentioned above.
 
-| X                 | Static world  | Dynamic world | Indoor    | Outdoor   | Shadow blockers   |
-|:-----------------:|:-------------:|:-------------:|:---------:|:---------:|:-----------------:|
-| Occlusion query   | OK            | Bad           | OK        | Bad       | Yes               |
-| Software OC       | OK            | OK            | Good      | OK        | No                |
-| Coverage buffer   | OK            | OK            | OK        | Good      | No                |
+|  X                  |  Static world   |  Dynamic world  |  Indoor     |  Outdoor    |  Shadow blockers    |
+| ------------------- | --------------- | --------------- | ----------- | ----------- | ------------------- |
+|  Occlusion query    |  OK             |  Bad            |  OK         |  Bad        |  Yes                |
+|  Software OC        |  OK             |  OK             |  Good       |  OK         |  No                 |
+|  Coverage buffer    |  OK             |  OK             |  OK         |  Good       |  No                 |
 
 
 ## Occlusion culling with geometry shaders
