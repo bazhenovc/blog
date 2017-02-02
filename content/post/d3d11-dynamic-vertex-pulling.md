@@ -427,12 +427,12 @@ The main source code for this method is [here](https://github.com/bazhenovc/sigr
 Here are some screenshots:
 16384 unique cubes, 1.2ms per frame on Intel HD 4400:
 
-![cubes](dvp_cubes.png)
+![cubes](/dvp_cubes.png)
 
 
 4096 unique instances of grass, 200k triangles:
 
-![grass](dvp_grass.png)
+![grass](/dvp_grass.png)
 
 # Further reading
 
