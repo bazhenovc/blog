@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Kirill Bazhenov&#39;s blog</title>
+    <title>bazhenovc</title>
     <link>https://bazhenovc.github.io/blog/index.xml</link>
-    <description>Recent content on Kirill Bazhenov&#39;s blog</description>
+    <description>Recent content on bazhenovc</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Thu, 02 Feb 2017 03:26:00 +0300</lastBuildDate>
