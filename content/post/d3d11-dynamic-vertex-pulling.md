@@ -3,7 +3,7 @@ date = "2017-02-02T02:33:31+03:00"
 title = "Dynamic vertex pulling with D3D11"
 draft = false
 categories = [
-  "Programming",
+  "Programming", "Graphics"
 ]
 tags = [ "Direct3D", "Direct3D 11" ]
 +++
