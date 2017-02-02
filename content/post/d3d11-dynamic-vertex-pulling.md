@@ -439,5 +439,3 @@ Here are some screenshots:
 [OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos](http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling) - almost the same method for OpenGL.
 
 Thanks for your attention!
-
-{{ template "_internal/disqus.html" . }}
