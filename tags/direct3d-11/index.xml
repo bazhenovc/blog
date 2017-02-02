@@ -18,7 +18,7 @@
 
 &lt;p&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;table-of-contents&#34;&gt;Table of contents&lt;/h1&gt;
+&lt;h2 id=&#34;table-of-contents&#34;&gt;Table of contents&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;A quick history of the occlusion culling algorithms
@@ -36,11 +36,11 @@
 &lt;li&gt;Use cases and demos&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;occlusion-queries&#34;&gt;Occlusion queries&lt;/h1&gt;
+&lt;h2 id=&#34;occlusion-queries&#34;&gt;Occlusion queries&lt;/h2&gt;
 
 &lt;p&gt;This is the most ancient and used method - you render your scene in a special rendering mode with either D3D11_QUERY_OCCLUSION or GL_ARB_occlusion_query and after a few frames it will return you the amount of pixels pixel shader was invoked for.&lt;/p&gt;
 
-&lt;h2 id=&#34;summary&#34;&gt;Summary&lt;/h2&gt;
+&lt;h3 id=&#34;summary&#34;&gt;Summary&lt;/h3&gt;
 
 &lt;p&gt;They are good because:&lt;/p&gt;
 
@@ -64,7 +64,7 @@
 &lt;li&gt;Pixel-to-visibility correlation is not obvious and awkward&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;software-occlusion-culling&#34;&gt;Software occlusion culling&lt;/h1&gt;
+&lt;h2 id=&#34;software-occlusion-culling&#34;&gt;Software occlusion culling&lt;/h2&gt;
 
 &lt;p&gt;This technique uses software rasterization to render occluders to the downscaled depth buffer and test occludees against it. Everything is done on the CPU.&lt;/p&gt;
 
@@ -72,7 +72,7 @@
 
 &lt;p&gt;Intel suggest an efficient SIMD-optimized way to rasterize and test boxes agains a depth buffer.&lt;/p&gt;
 
-&lt;h2 id=&#34;summary-1&#34;&gt;Summary&lt;/h2&gt;
+&lt;h3 id=&#34;summary-1&#34;&gt;Summary&lt;/h3&gt;
 
 &lt;p&gt;It is good because:&lt;/p&gt;
 
@@ -100,7 +100,7 @@
 &lt;li&gt;Bad for consoles, because requires high-end CPU (a selling feature for Intel?)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;coverage-buffer&#34;&gt;Coverage buffer&lt;/h1&gt;
+&lt;h2 id=&#34;coverage-buffer&#34;&gt;Coverage buffer&lt;/h2&gt;
 
 &lt;p&gt;There&amp;rsquo;s not much to say about it except that it is almost the same as software OC. The only difference is that instead of rasterizing occluders it reads the depth buffer from the GPU, downscales and reprojects it and tests occludees against it.&lt;/p&gt;
 
@@ -108,7 +108,7 @@
 
 &lt;p&gt;It was pioneered by Unreal in 1997 and later used in production by &lt;a href=&#34;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&#34;&gt;Crytek&lt;/a&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;reprojection&#34;&gt;Reprojection&lt;/h2&gt;
+&lt;h3 id=&#34;reprojection&#34;&gt;Reprojection&lt;/h3&gt;
 
 &lt;p&gt;GPU readback has high frame latency, so in order for this to work the depth buffer values must be unprojected using the previous frame matrices and projected back using the current frame matrices - this step is called reprojection.&lt;/p&gt;
 
@@ -120,7 +120,7 @@
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/oc_reprojection_holes_fix.png&#34; alt=&#34;holes_fix&#34; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;summary-2&#34;&gt;Summary&lt;/h2&gt;
+&lt;h3 id=&#34;summary-2&#34;&gt;Summary&lt;/h3&gt;
 
 &lt;p&gt;It is good because:&lt;/p&gt;
 
@@ -145,53 +145,53 @@
 &lt;li&gt;Everything else is the same as in software OC&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;occlusion-queries-vs-software-occlusion-culling-vs-coverage-buffer&#34;&gt;Occlusion queries vs Software occlusion culling vs Coverage buffer&lt;/h1&gt;
+&lt;h2 id=&#34;occlusion-queries-vs-software-occlusion-culling-vs-coverage-buffer&#34;&gt;Occlusion queries vs Software occlusion culling vs Coverage buffer&lt;/h2&gt;
 
 &lt;p&gt;Here&amp;rsquo;s a small comparison table for methods mentioned above.&lt;/p&gt;
 
 &lt;table&gt;
 &lt;thead&gt;
 &lt;tr&gt;
-&lt;th&gt;X&lt;/th&gt;
-&lt;th&gt;Static world&lt;/th&gt;
-&lt;th&gt;Dynamic world&lt;/th&gt;
-&lt;th&gt;Indoor&lt;/th&gt;
-&lt;th&gt;Outdoor&lt;/th&gt;
-&lt;th&gt;Shadow blockers&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;X&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Static world&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Dynamic world&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Indoor&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Outdoor&lt;/th&gt;
+&lt;th align=&#34;center&#34;&gt;Shadow blockers&lt;/th&gt;
 &lt;/tr&gt;
 &lt;/thead&gt;
 
 &lt;tbody&gt;
 &lt;tr&gt;
-&lt;td&gt;Occlusion query&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;Bad&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;Bad&lt;/td&gt;
-&lt;td&gt;Yes&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Occlusion query&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Bad&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Bad&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Yes&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;Software OC&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;Good&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;No&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Software OC&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Good&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;No&lt;/td&gt;
 &lt;/tr&gt;
 
 &lt;tr&gt;
-&lt;td&gt;Coverage buffer&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;OK&lt;/td&gt;
-&lt;td&gt;Good&lt;/td&gt;
-&lt;td&gt;No&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Coverage buffer&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;OK&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;Good&lt;/td&gt;
+&lt;td align=&#34;center&#34;&gt;No&lt;/td&gt;
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
 
-&lt;h1 id=&#34;occlusion-culling-with-geometry-shaders&#34;&gt;Occlusion culling with geometry shaders&lt;/h1&gt;
+&lt;h2 id=&#34;occlusion-culling-with-geometry-shaders&#34;&gt;Occlusion culling with geometry shaders&lt;/h2&gt;
 
 &lt;p&gt;Arguably the first fully GPU driven occlusion culling method, pioneered by &lt;a href=&#34;http://rastergrid.com/blog/downloads/mountains-demo/&#34;&gt;Daniel Rákos&lt;/a&gt;&lt;/p&gt;
 
@@ -208,7 +208,7 @@
 &lt;li&gt;StreamOutput or TransformFeedback captures the emitted data&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;summary-3&#34;&gt;Summary&lt;/h2&gt;
+&lt;h3 id=&#34;summary-3&#34;&gt;Summary&lt;/h3&gt;
 
 &lt;p&gt;Pros:&lt;/p&gt;
 
@@ -230,7 +230,7 @@
 &lt;li&gt;Still uses a downscaled depth buffer&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;occlusion-culling-with-compute-shaders&#34;&gt;Occlusion culling with compute shaders&lt;/h1&gt;
+&lt;h2 id=&#34;occlusion-culling-with-compute-shaders&#34;&gt;Occlusion culling with compute shaders&lt;/h2&gt;
 
 &lt;p&gt;The general idea is to implement software OC using the GPU for rasterization and testing, huh.&lt;/p&gt;
 
@@ -263,7 +263,7 @@
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/gpu_oc.png&#34; alt=&#34;gpu_oc&#34; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;summary-4&#34;&gt;Summary&lt;/h2&gt;
+&lt;h3 id=&#34;summary-4&#34;&gt;Summary&lt;/h3&gt;
 
 &lt;p&gt;Pros:&lt;/p&gt;
 
@@ -294,7 +294,7 @@
 &lt;li&gt;Requires that everything is rendered with instancing and batched efficiently, otherwise not efficient&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h2 id=&#34;use-case-forest-rendering-in-life-is-feudal&#34;&gt;Use case: forest rendering in Life is Feudal&lt;/h2&gt;
+&lt;h3 id=&#34;use-case-forest-rendering-in-life-is-feudal&#34;&gt;Use case: forest rendering in Life is Feudal&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;We use a quad tree to split the whole forest into cells
@@ -329,7 +329,7 @@
 &lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered.png&#34; alt=&#34;forst_window_rendered&#34; /&gt;
 &lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered_off.png&#34; alt=&#34;forst_window_rendered_off&#34; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&#34;use-case-static-object-rendering-in-life-is-feudal&#34;&gt;Use case: static object rendering in Life is Feudal&lt;/h2&gt;
+&lt;h3 id=&#34;use-case-static-object-rendering-in-life-is-feudal&#34;&gt;Use case: static object rendering in Life is Feudal&lt;/h3&gt;
 
 &lt;ul&gt;
 &lt;li&gt;Works almost the same way as forests, but much more complex
@@ -355,7 +355,7 @@
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_diagram.png&#34; alt=&#34;lif_oc_diagram&#34; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&#34;managing-occlusion-shapes&#34;&gt;Managing occlusion shapes&lt;/h3&gt;
+&lt;h4 id=&#34;managing-occlusion-shapes&#34;&gt;Managing occlusion shapes&lt;/h4&gt;
 
 &lt;p&gt;It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.&lt;/p&gt;
 
@@ -365,7 +365,7 @@
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_mess.png&#34; alt=&#34;lif_oc_mess&#34; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&#34;bounding-box-merging&#34;&gt;Bounding box merging&lt;/h3&gt;
+&lt;h4 id=&#34;bounding-box-merging&#34;&gt;Bounding box merging&lt;/h4&gt;
 
 &lt;p&gt;Our occlusion shape management code allowed us to introduce a nice optimization we call box merging.&lt;/p&gt;
 
@@ -390,7 +390,7 @@
 
 &lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/blog/lif_oc_boxmerge_result.png&#34; alt=&#34;lif_oc_boxmerge_result&#34; /&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;conclusions&#34;&gt;Conclusions&lt;/h1&gt;
+&lt;h2 id=&#34;conclusions&#34;&gt;Conclusions&lt;/h2&gt;
 
 &lt;ul&gt;
 &lt;li&gt;GPU driven occlusion culling is a must!&lt;/li&gt;
@@ -400,7 +400,7 @@
 &lt;li&gt;DX11 demo source code: &lt;a href=&#34;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&#34;&gt;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&#34;references&#34;&gt;References&lt;/h1&gt;
+&lt;h2 id=&#34;references&#34;&gt;References&lt;/h2&gt;
 
 &lt;p&gt;&lt;a href=&#34;https://software.intel.com/en-us/articles/software-occlusion-culling&#34;&gt;https://software.intel.com/en-us/articles/software-occlusion-culling&lt;/a&gt;
 &lt;a href=&#34;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&#34;&gt;http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology&lt;/a&gt;
@@ -408,7 +408,7 @@
 &lt;a href=&#34;https://github.com/nvpro-samples/gl_occlusion_culling&#34;&gt;https://github.com/nvpro-samples/gl_occlusion_culling&lt;/a&gt;
 &lt;a href=&#34;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&#34;&gt;https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc&lt;/a&gt;&lt;/p&gt;
 
-&lt;h1 id=&#34;bug&#34;&gt;Bug&lt;/h1&gt;
+&lt;h2 id=&#34;bug&#34;&gt;Bug&lt;/h2&gt;
 
 &lt;p&gt;Here&amp;rsquo;s a nice DrawIndirect-related driver bug that I&amp;rsquo;ve found worth sharing:&lt;/p&gt;
 

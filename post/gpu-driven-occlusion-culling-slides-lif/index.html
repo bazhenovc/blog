@@ -130,7 +130,7 @@
 
 <p></p>
 
-<h1 id="table-of-contents">Table of contents</h1>
+<h2 id="table-of-contents">Table of contents</h2>
 
 <ul>
 <li>A quick history of the occlusion culling algorithms
@@ -148,11 +148,11 @@
 <li>Use cases and demos</li>
 </ul>
 
-<h1 id="occlusion-queries">Occlusion queries</h1>
+<h2 id="occlusion-queries">Occlusion queries</h2>
 
 <p>This is the most ancient and used method - you render your scene in a special rendering mode with either D3D11_QUERY_OCCLUSION or GL_ARB_occlusion_query and after a few frames it will return you the amount of pixels pixel shader was invoked for.</p>
 
-<h2 id="summary">Summary</h2>
+<h3 id="summary">Summary</h3>
 
 <p>They are good because:</p>
 
@@ -176,7 +176,7 @@
 <li>Pixel-to-visibility correlation is not obvious and awkward</li>
 </ul>
 
-<h1 id="software-occlusion-culling">Software occlusion culling</h1>
+<h2 id="software-occlusion-culling">Software occlusion culling</h2>
 
 <p>This technique uses software rasterization to render occluders to the downscaled depth buffer and test occludees against it. Everything is done on the CPU.</p>
 
@@ -184,7 +184,7 @@
 
 <p>Intel suggest an efficient SIMD-optimized way to rasterize and test boxes agains a depth buffer.</p>
 
-<h2 id="summary-1">Summary</h2>
+<h3 id="summary-1">Summary</h3>
 
 <p>It is good because:</p>
 
@@ -212,7 +212,7 @@
 <li>Bad for consoles, because requires high-end CPU (a selling feature for Intel?)</li>
 </ul>
 
-<h1 id="coverage-buffer">Coverage buffer</h1>
+<h2 id="coverage-buffer">Coverage buffer</h2>
 
 <p>There&rsquo;s not much to say about it except that it is almost the same as software OC. The only difference is that instead of rasterizing occluders it reads the depth buffer from the GPU, downscales and reprojects it and tests occludees against it.</p>
 
@@ -220,7 +220,7 @@
 
 <p>It was pioneered by Unreal in 1997 and later used in production by <a href="http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology">Crytek</a></p>
 
-<h2 id="reprojection">Reprojection</h2>
+<h3 id="reprojection">Reprojection</h3>
 
 <p>GPU readback has high frame latency, so in order for this to work the depth buffer values must be unprojected using the previous frame matrices and projected back using the current frame matrices - this step is called reprojection.</p>
 
@@ -232,7 +232,7 @@
 
 <p><img src="/blog/oc_reprojection_holes_fix.png" alt="holes_fix" /></p>
 
-<h2 id="summary-2">Summary</h2>
+<h3 id="summary-2">Summary</h3>
 
 <p>It is good because:</p>
 
@@ -257,53 +257,53 @@
 <li>Everything else is the same as in software OC</li>
 </ul>
 
-<h1 id="occlusion-queries-vs-software-occlusion-culling-vs-coverage-buffer">Occlusion queries vs Software occlusion culling vs Coverage buffer</h1>
+<h2 id="occlusion-queries-vs-software-occlusion-culling-vs-coverage-buffer">Occlusion queries vs Software occlusion culling vs Coverage buffer</h2>
 
 <p>Here&rsquo;s a small comparison table for methods mentioned above.</p>
 
 <table>
 <thead>
 <tr>
-<th>X</th>
-<th>Static world</th>
-<th>Dynamic world</th>
-<th>Indoor</th>
-<th>Outdoor</th>
-<th>Shadow blockers</th>
+<th align="center">X</th>
+<th align="center">Static world</th>
+<th align="center">Dynamic world</th>
+<th align="center">Indoor</th>
+<th align="center">Outdoor</th>
+<th align="center">Shadow blockers</th>
 </tr>
 </thead>
 
 <tbody>
 <tr>
-<td>Occlusion query</td>
-<td>OK</td>
-<td>Bad</td>
-<td>OK</td>
-<td>Bad</td>
-<td>Yes</td>
+<td align="center">Occlusion query</td>
+<td align="center">OK</td>
+<td align="center">Bad</td>
+<td align="center">OK</td>
+<td align="center">Bad</td>
+<td align="center">Yes</td>
 </tr>
 
 <tr>
-<td>Software OC</td>
-<td>OK</td>
-<td>OK</td>
-<td>Good</td>
-<td>OK</td>
-<td>No</td>
+<td align="center">Software OC</td>
+<td align="center">OK</td>
+<td align="center">OK</td>
+<td align="center">Good</td>
+<td align="center">OK</td>
+<td align="center">No</td>
 </tr>
 
 <tr>
-<td>Coverage buffer</td>
-<td>OK</td>
-<td>OK</td>
-<td>OK</td>
-<td>Good</td>
-<td>No</td>
+<td align="center">Coverage buffer</td>
+<td align="center">OK</td>
+<td align="center">OK</td>
+<td align="center">OK</td>
+<td align="center">Good</td>
+<td align="center">No</td>
 </tr>
 </tbody>
 </table>
 
-<h1 id="occlusion-culling-with-geometry-shaders">Occlusion culling with geometry shaders</h1>
+<h2 id="occlusion-culling-with-geometry-shaders">Occlusion culling with geometry shaders</h2>
 
 <p>Arguably the first fully GPU driven occlusion culling method, pioneered by <a href="http://rastergrid.com/blog/downloads/mountains-demo/">Daniel Rákos</a></p>
 
@@ -320,7 +320,7 @@
 <li>StreamOutput or TransformFeedback captures the emitted data</li>
 </ul>
 
-<h2 id="summary-3">Summary</h2>
+<h3 id="summary-3">Summary</h3>
 
 <p>Pros:</p>
 
@@ -342,7 +342,7 @@
 <li>Still uses a downscaled depth buffer</li>
 </ul>
 
-<h1 id="occlusion-culling-with-compute-shaders">Occlusion culling with compute shaders</h1>
+<h2 id="occlusion-culling-with-compute-shaders">Occlusion culling with compute shaders</h2>
 
 <p>The general idea is to implement software OC using the GPU for rasterization and testing, huh.</p>
 
@@ -375,7 +375,7 @@
 
 <p><img src="/blog/gpu_oc.png" alt="gpu_oc" /></p>
 
-<h2 id="summary-4">Summary</h2>
+<h3 id="summary-4">Summary</h3>
 
 <p>Pros:</p>
 
@@ -406,7 +406,7 @@
 <li>Requires that everything is rendered with instancing and batched efficiently, otherwise not efficient</li>
 </ul>
 
-<h2 id="use-case-forest-rendering-in-life-is-feudal">Use case: forest rendering in Life is Feudal</h2>
+<h3 id="use-case-forest-rendering-in-life-is-feudal">Use case: forest rendering in Life is Feudal</h3>
 
 <ul>
 <li>We use a quad tree to split the whole forest into cells
@@ -441,7 +441,7 @@
 <img src="/blog/lif_oc_forest_window_rendered.png" alt="forst_window_rendered" />
 <img src="/blog/lif_oc_forest_window_rendered_off.png" alt="forst_window_rendered_off" /></p>
 
-<h2 id="use-case-static-object-rendering-in-life-is-feudal">Use case: static object rendering in Life is Feudal</h2>
+<h3 id="use-case-static-object-rendering-in-life-is-feudal">Use case: static object rendering in Life is Feudal</h3>
 
 <ul>
 <li>Works almost the same way as forests, but much more complex
@@ -467,7 +467,7 @@
 
 <p><img src="/blog/lif_oc_diagram.png" alt="lif_oc_diagram" /></p>
 
-<h3 id="managing-occlusion-shapes">Managing occlusion shapes</h3>
+<h4 id="managing-occlusion-shapes">Managing occlusion shapes</h4>
 
 <p>It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.</p>
 
@@ -477,7 +477,7 @@
 
 <p><img src="/blog/lif_oc_mess.png" alt="lif_oc_mess" /></p>
 
-<h3 id="bounding-box-merging">Bounding box merging</h3>
+<h4 id="bounding-box-merging">Bounding box merging</h4>
 
 <p>Our occlusion shape management code allowed us to introduce a nice optimization we call box merging.</p>
 
@@ -502,7 +502,7 @@
 
 <p><img src="/blog/lif_oc_boxmerge_result.png" alt="lif_oc_boxmerge_result" /></p>
 
-<h1 id="conclusions">Conclusions</h1>
+<h2 id="conclusions">Conclusions</h2>
 
 <ul>
 <li>GPU driven occlusion culling is a must!</li>
@@ -512,7 +512,7 @@
 <li>DX11 demo source code: <a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc">https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc</a></li>
 </ul>
 
-<h1 id="references">References</h1>
+<h2 id="references">References</h2>
 
 <p><a href="https://software.intel.com/en-us/articles/software-occlusion-culling">https://software.intel.com/en-us/articles/software-occlusion-culling</a>
 <a href="http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology">http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology</a>
@@ -520,7 +520,7 @@
 <a href="https://github.com/nvpro-samples/gl_occlusion_culling">https://github.com/nvpro-samples/gl_occlusion_culling</a>
 <a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc">https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc</a></p>
 
-<h1 id="bug">Bug</h1>
+<h2 id="bug">Bug</h2>
 
 <p>Here&rsquo;s a nice DrawIndirect-related driver bug that I&rsquo;ve found worth sharing:</p>
 
