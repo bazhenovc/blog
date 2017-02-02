@@ -211,7 +211,7 @@ Cons:
 Here is the worst case when everything is visible and nothing is culled:
 
 ![forest_view](/blog/lif_oc_forest.png)
-![forest_bounds](/blog_lif_oc_forest_bounds.png)
+![forest_bounds](/blog/lif_oc_forest_bounds.png)
 
 Here is the best case when only a small fraction is visible:
 
