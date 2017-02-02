@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
 
+  <head>
     <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
 
 <meta property="og:title" content="Dynamic vertex pulling with D3D11" />
 <meta property="og:description" content="This is crossposted from GameDev.net
@@ -14,7 +14,9 @@
 <meta property="og:url" content="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" />
 
 
-<meta property="og:updated_time" content="2017-02-02T02:33:31&#43;03:00"/>
+
+<meta property="article:published_time" content="2017-02-02T02:33:31&#43;03:00"/>
+<meta property="article:modified_time" content="2017-02-02T02:33:31&#43;03:00"/>
 
 
 
@@ -26,18 +28,6 @@
 
 
 
-<meta itemprop="name" content="Dynamic vertex pulling with D3D11">
-<meta itemprop="description" content="This is crossposted from GameDev.net
-
-">
-
-
-<meta itemprop="dateModified" content="2017-02-02T02:33:31&#43;03:00" />
-<meta itemprop="wordCount" content="2058">
-
-
-
-<meta itemprop="keywords" content="graphics,programming,direct3d,direct3d-11,opengl," />
 
 
 
@@ -51,179 +41,95 @@
 "/>
 
 
-
-
-
-
-
-
 <meta name="generator" content="Hugo 0.18.1" />
 
 
-    <base href="https://bazhenovc.github.io/blog/">
+    
+<script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "BlogPosting",
+  
+  "headline": "Dynamic vertex pulling with D3D11",
+  "url": "https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/",
+  "wordCount": "2058",
+  
+  
+  "datePublished": "2017-02-02T02:33:31+03:00",
+  
+  
+  "dateModified": "2017-02-02T02:33:31+03:00",
+  
+  
+  "author": {
+    "@type": "Person",
+    "name": ""
+  }
+  
+  ,
+  "keywords": "Programming,Graphics,Direct3D,Direct3D 11"
+  
+}
+</script>
+
+
+
     <link rel="canonical" href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">
+
     <title>Dynamic vertex pulling with D3D11 | bazhenovc</title>
 
-    <!-- CSS -->
-    <link href="https://bazhenovc.github.io/blog/css/app.css" rel="stylesheet">
+    <!-- combined, minified CSS -->
+    <link href="https://bazhenovc.github.io/blog/css/style.css" rel="stylesheet" integrity="sha384-qRVpIj9hSzsBhmO8Y7YEKF2UFra2sJQtl9V/uFKKDvy&#43;Wjh9zgTku6VRgT8YdPoD" crossorigin="anonymous">
 
     
 
     
 
     
-    
 
+    
 
   </head>
+
   <body>
 
-    <header class="nav">
-      <div class="top-bar">
-        <div class="row column">
-          <div class="top-bar-left">
-            <ul class="menu">
-              <li><a href="https://bazhenovc.github.io/blog/">
-                  bazhenovc
-                </a></li>
-            </ul>
-          </div>
-          <div class="top-bar-right">
-            <ul class="menu">
-              <li class=""><a href="https://bazhenovc.github.io/blog/">
-                Home
-              </a></li>
-              
-                
-                  <li><a href="https://bazhenovc.github.io/blog/categories/">
-                    Categories
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/tags/direct3d/">
-                    Direct3d
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/tags/direct3d-11/">
-                    Direct3d 11
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/categories/graphics/">
-                    Graphics
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/tags/opengl/">
-                    Opengl
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/post/">
-                    Posts
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/categories/programming/">
-                    Programming
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/tags/">
-                    Tags
-                  </a></li>
-                
-                  <li><a href="https://bazhenovc.github.io/blog/">
-                    bazhenovc
-                  </a></li>
-                
-              
-            </ul>
-          </div>
-        </div>
+    <div class="blog-masthead">
+      <div class="container">
+        <nav class="nav blog-nav">
+          <a class="nav-link " href="https://bazhenovc.github.io/blog/">Home</a>
+          
+          
+          
+        </nav>
       </div>
-    </header>
+    </div>
 
     <header class="blog-header">
-      <div class="callout large">
-        <div class="row column text-center">
-          <h1>
-            <a href="https://bazhenovc.github.io/blog/" rel="home">bazhenovc</a>
-          </h1>
-          
-        </div>
+      <div class="container">
+        <h1 class="blog-title"><a href="https://bazhenovc.github.io/blog/" rel="home">bazhenovc</a></h1>
+        
       </div>
     </header>
 
-    <main>
-      <div class="row" id="content">
-        <div class="medium-8 columns">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-8 blog-main">
+
           
-  
 
 
-  <div class="blog-post">
-    <h3>
-      <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">Dynamic vertex pulling with D3D11</a>
-    </h3>
-    <div class="callout small">
-      <small>
-        <time datetime="2017-02-02T02:33:31&#43;03:00">
-          Thu Feb 2, 2017
-        </time> by .
-        Categories: 
-  
-    
-      <a href="/blog/categories/programming">
-        Programming
-      </a>
-  
-    /
-    
-      <a href="/blog/categories/graphics">
-        Graphics
-      </a>
-  
-
-.
-        Tags: 
-  
-    
-      <a href="/blog/tags/direct3d">
-        Direct3D
-      </a>
-  
-    ,
-    
-      <a href="/blog/tags/direct3d-11">
-        Direct3D 11
-      </a>
-  
-
-.
-        <br>
-        
-          Share
-
-    <a href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on Facebook">
-      Facebook
-    </a>,
+<article class="blog-post">
+  <header>
+    <h2 class="blog-post-title"><a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">Dynamic vertex pulling with D3D11</a></h2>
+    <p class="blog-post-meta"><time datetime="2017-02-02T02:33:31&#43;03:00">Thu Feb 2, 2017</time> by  in 
+<i class="fa fa-folder" aria-hidden="true"></i>&nbsp;<a href="/blog/categories/programming" rel="category tag">Programming</a>, <a href="/blog/categories/graphics" rel="category tag">Graphics</a>
 
 
-    <a href="https://plus.google.com/share?url=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on Google+">
-      Google+
-    </a>,
+<i class="fa fa-tag" aria-hidden="true"></i>&nbsp;<a href="/blog/tags/direct3d" rel="tag">Direct3D</a>, <a href="/blog/tags/direct3d-11" rel="tag">Direct3D 11</a>
 
-
-    <a href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on LinkedIn">
-      LinkedIn
-    </a>,
-
-
-    <a href="https://twitter.com/home?status=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Tweet this">
-      Twitter
-    </a>
-
-
-        
-      </small>
-    </div>
-    <p>
-      <p>This is crossposted from <a href="http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048">GameDev.net</a></p>
+</p>
+  </header>
+  <p>This is crossposted from <a href="http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048">GameDev.net</a></p>
 
 <p></p>
 
@@ -668,13 +574,28 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 <p><a href="http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling">OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos</a> - almost the same method for OpenGL.</p>
 
 <p>Thanks for your attention!</p>
-    </p>
-    
-    <hr>
-  </div>
 
   
-    <div id="disqus_thread"></div>
+
+  
+  <hr>
+  <footer>
+
+  
+    <section>
+    <h4>Share</h4>
+    <nav class="nav sharing-icons">
+      <a class="nav-item" href="https://www.facebook.com/sharer/sharer.php?u=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on Facebook"><span class="fa fa-facebook fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://plus.google.com/share?url=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on Google+"><span class="fa fa-google-plus fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Share on LinkedIn"><span class="fa fa-linkedin fa-2x" aria-hidden="true"></span></a>
+      <a class="nav-item" href="https://twitter.com/home?status=https%3a%2f%2fbazhenovc.github.io%2fblog%2fpost%2fd3d11-dynamic-vertex-pulling%2f" title="Tweet this"><span class="fa fa-twitter fa-2x"></span></a>
+    </nav>
+  </section>
+
+  
+
+  
+  <div id="disqus_thread"></div>
 <script type="text/javascript">
 
 (function() {
@@ -693,35 +614,38 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 <a href="http://disqus.com/" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
   
+  </footer>
+  
+
+</article> 
 
 
-        </div>
-          <div class="medium-3 columns" data-sticky-container>
-  <div class="sticky" data-sticky data-anchor="content">
 
+        </div> <!-- /.blog-main -->
+
+        <aside class="col-sm-3 offset-sm-1 blog-sidebar">
   
 
   
-      </div>
-    </main>
+
+  
+</aside>
+
+
+      </div> <!-- /.row -->
+    </div> <!-- /.container -->
 
     <footer class="blog-footer">
-      <div class="row column">
-        <p>
-          
-          Blog template created by <a href="hhttps://github.com/zurb">@zurb</a>, ported to Hugo by <a href='https://github.com/htko89'>github.com/htko89</a>.
-          
-        </p>
-        <p>
-          <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/#">Back to top</a>
-        </p>
-      </div>
+      <p>
+      
+      Blog template created by <a href="https://twitter.com/mdo">@mdo</a>, ported to Hugo by <a href='https://twitter.com/mralanorth'>@mralanorth</a>.
+      
+      </p>
+      <p>
+      <a href="#">Back to top</a>
+      </p>
     </footer>
 
-  <foot>
-
-    <script src="https://bazhenovc.github.io/blog/js/app.js"></script>
-
-  </foot>
   </body>
+
 </html>
