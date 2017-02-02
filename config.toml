@@ -1,4 +1,4 @@
 languageCode = "en-us"
-title = "Kirill Bazhenov blog"
+title = "Kirill Bazhenov's blog"
 baseurl = "https://bazhenovc.github.io/blog/"
-disqusShortname = "@bazhenovc"
+disqusShortname = "baz_blog"
