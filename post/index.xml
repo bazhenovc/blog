@@ -462,19 +462,5 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 &lt;p&gt;Thanks for your attention!&lt;/p&gt;</description>
     </item>
     
-    <item>
-      <title>hello world</title>
-      <link>https://bazhenovc.github.io/blog/post/hello-world/</link>
-      <pubDate>Thu, 02 Feb 2017 02:15:27 +0300</pubDate>
-      
-      <guid>https://bazhenovc.github.io/blog/post/hello-world/</guid>
-      <description>
-
-&lt;h1 id=&#34;hello-world&#34;&gt;Hello world&lt;/h1&gt;
-
-&lt;p&gt;Hello world!&lt;/p&gt;
-</description>
-    </item>
-    
   </channel>
 </rss>
