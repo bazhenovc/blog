@@ -459,9 +459,7 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 
 &lt;p&gt;&lt;a href=&#34;http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling&#34;&gt;OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos&lt;/a&gt; - almost the same method for OpenGL.&lt;/p&gt;
 
-&lt;p&gt;Thanks for your attention!&lt;/p&gt;
-
-&lt;p&gt;{{ template &amp;ldquo;_internal/disqus.html&amp;rdquo; . }}&lt;/p&gt;</description>
+&lt;p&gt;Thanks for your attention!&lt;/p&gt;</description>
     </item>
     
     <item>
