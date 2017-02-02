@@ -12,7 +12,7 @@ In 2016 I gave a small talk in Dublin, Ireland about the subj, here are [the sli
 
 <!--more-->
 
-# Table of contents
+## Table of contents
 
 * A quick history of the occlusion culling algorithms
     - Occlusion queries
@@ -25,11 +25,11 @@ In 2016 I gave a small talk in Dublin, Ireland about the subj, here are [the sli
 * Occlusion culling with compute shaders
 * Use cases and demos
 
-# Occlusion queries
+## Occlusion queries
 
 This is the most ancient and used method - you render your scene in a special rendering mode with either D3D11_QUERY_OCCLUSION or GL_ARB_occlusion_query and after a few frames it will return you the amount of pixels pixel shader was invoked for.
 
-## Summary
+### Summary
 
 They are good because:
 
@@ -46,7 +46,7 @@ They are bad because:
     - Even higher in case of multi GPU setups
 * Pixel-to-visibility correlation is not obvious and awkward
 
-# Software occlusion culling
+## Software occlusion culling
 
 This technique uses software rasterization to render occluders to the downscaled depth buffer and test occludees against it. Everything is done on the CPU.
 
@@ -54,7 +54,7 @@ The most recent paper on this is from [Intel](https://software.intel.com/en-us/a
 
 Intel suggest an efficient SIMD-optimized way to rasterize and test boxes agains a depth buffer.
 
-## Summary
+### Summary
 
 It is good because:
 
@@ -72,7 +72,7 @@ It is bad because:
 * Due to the fact above suits bad for dynamic scenes
 * Bad for consoles, because requires high-end CPU (a selling feature for Intel?)
 
-# Coverage buffer
+## Coverage buffer
 
 There's not much to say about it except that it is almost the same as software OC. The only difference is that instead of rasterizing occluders it reads the depth buffer from the GPU, downscales and reprojects it and tests occludees against it.
 
@@ -80,7 +80,7 @@ Also, it reintroduces the nasty frame latency.
 
 It was pioneered by Unreal in 1997 and later used in production by [Crytek](http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology)
 
-## Reprojection
+### Reprojection
 
 GPU readback has high frame latency, so in order for this to work the depth buffer values must be unprojected using the previous frame matrices and projected back using the current frame matrices - this step is called reprojection.
 
@@ -93,7 +93,7 @@ In order to fix them a simple dilation filter is applied, though it does not fix
 ![holes_fix](/blog/oc_reprojection_holes_fix.png)
 
 
-## Summary
+### Summary
 
 It is good because:
 
@@ -111,18 +111,18 @@ It is bad because:
 * Depth buffer readback has the same latency as occlusion queries
 * Everything else is the same as in software OC
 
-# Occlusion queries vs Software occlusion culling vs Coverage buffer
+## Occlusion queries vs Software occlusion culling vs Coverage buffer
 
 Here's a small comparison table for methods mentioned above.
 
 | X                 | Static world  | Dynamic world | Indoor    | Outdoor   | Shadow blockers   |
-|-------------------|---------------|---------------|-----------|-----------|-------------------|
+|:-----------------:|:-------------:|:-------------:|:---------:|:---------:|:-----------------:|
 | Occlusion query   | OK            | Bad           | OK        | Bad       | Yes               |
 | Software OC       | OK            | OK            | Good      | OK        | No                |
 | Coverage buffer   | OK            | OK            | OK        | Good      | No                |
 
 
-# Occlusion culling with geometry shaders
+## Occlusion culling with geometry shaders
 
 Arguably the first fully GPU driven occlusion culling method, pioneered by [Daniel Rákos](http://rastergrid.com/blog/downloads/mountains-demo/)
 
@@ -134,7 +134,7 @@ The main idea is to render occludees as points (with bounding box data as attrib
     - If test is passed then GS emits the primitive
 * StreamOutput or TransformFeedback captures the emitted data
 
-## Summary
+### Summary
 
 Pros:
 
@@ -152,7 +152,7 @@ Cons:
 * Kills vertex cache (though can be fixed)
 * Still uses a downscaled depth buffer
 
-# Occlusion culling with compute shaders
+## Occlusion culling with compute shaders
 
 The general idea is to implement software OC using the GPU for rasterization and testing, huh.
 
@@ -174,7 +174,7 @@ It works this way:
 
 ![gpu_oc](/blog/gpu_oc.png)
 
-## Summary
+### Summary
 
 Pros:
 
@@ -195,7 +195,7 @@ Cons:
 * Indirect rendering is usually slower then usual rendering
 * Requires that everything is rendered with instancing and batched efficiently, otherwise not efficient
 
-## Use case: forest rendering in Life is Feudal
+### Use case: forest rendering in Life is Feudal
 
 * We use a quad tree to split the whole forest into cells
     - Each cells is used as a bounding volume for an area covered by trees
@@ -222,7 +222,7 @@ And here is what was actually rendered with occlusion culling on and off:
 ![forst_window_rendered](/blog/lif_oc_forest_window_rendered.png)
 ![forst_window_rendered_off](/blog/lif_oc_forest_window_rendered_off.png)
 
-## Use case: static object rendering in Life is Feudal
+### Use case: static object rendering in Life is Feudal
 
 * Works almost the same way as forests, but much more complex
     - Need two separate IDs for every object - for occlusion shape and object itself
@@ -237,7 +237,7 @@ Here is a small diagram that shows all the relations between objects/shapes/IDs:
 
 ![lif_oc_diagram](/blog/lif_oc_diagram.png)
 
-### Managing occlusion shapes
+#### Managing occlusion shapes
 
 It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.
 
@@ -247,7 +247,7 @@ And here's the mess we've had on early implementation stages - due to the overdr
 
 ![lif_oc_mess](/blog/lif_oc_mess.png)
 
-### Bounding box merging
+#### Bounding box merging
 
 Our occlusion shape management code allowed us to introduce a nice optimization we call box merging.
 
@@ -264,7 +264,7 @@ And here's how it looks in practice:
 
 ![lif_oc_boxmerge_result](/blog/lif_oc_boxmerge_result.png)
 
-# Conclusions
+## Conclusions
 
 * GPU driven occlusion culling is a must!
 * Can easily switch between coverage buffer / conventional culling
@@ -272,7 +272,7 @@ And here's how it looks in practice:
 * A great improvement over the previous methods
 * DX11 demo source code: https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc
 
-# References
+## References
 
 https://software.intel.com/en-us/articles/software-occlusion-culling
 http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology
@@ -280,7 +280,7 @@ http://rastergrid.com/blog/downloads/mountains-demo/
 https://github.com/nvpro-samples/gl_occlusion_culling
 https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc
 
-# Bug
+## Bug
 
 Here's a nice DrawIndirect-related driver bug that I've found worth sharing:
 
