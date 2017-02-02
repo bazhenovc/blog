@@ -449,11 +449,11 @@ else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 &lt;p&gt;Here are some screenshots:
 16384 unique cubes, 1.2ms per frame on Intel HD 4400:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/dvp_cubes.png&#34; alt=&#34;cubes&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://bazhenovc.github.io/blog/dvp_cubes.png&#34;&gt;cubes&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;4096 unique instances of grass, 200k triangles:&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&#34;https://bazhenovc.github.io/blog/dvp_grass.png&#34; alt=&#34;grass&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&#34;https://bazhenovc.github.io/blog/dvp_grass.png&#34;&gt;grass&lt;/a&gt;&lt;/p&gt;
 
 &lt;h1 id=&#34;further-reading&#34;&gt;Further reading&lt;/h1&gt;
 
