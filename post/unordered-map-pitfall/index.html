@@ -149,8 +149,7 @@ template&lt;class _Kty,
     //
     // Irrelevant code omitted
     //
-    template&lt;class _Valty,
-        class = enable_if_t&lt;is_constructible&lt;value_type, _Valty&gt;::value&gt; &gt;
+    template&lt; ... &gt;
         _Pairib insert(_Valty&amp;&amp; _Val)
         {   // insert _Val
         return (this-&gt;emplace(_STD forward&lt;_Valty&gt;(_Val)));
@@ -159,7 +158,7 @@ template&lt;class _Kty,
 
 <p>So, insert() calls this-&gt;emplace(&hellip;). Let&rsquo;s examine that method too:</p>
 
-<p><unordered_map>:</p>
+<p><code>unordered_map</code>:</p>
 
 <pre><code>template&lt;class... _Valty&gt;
     iterator emplace(_Valty&amp;&amp;... _Val)
@@ -170,7 +169,7 @@ template&lt;class _Kty,
 
 <p>That routes it to _Mybase::emplace. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
 
-<p><xhash>:</p>
+<p><code>xhash</code>:</p>
 
 <pre><code>        // TEMPLATE CLASS _Hash
 template&lt;class _Traits&gt;
@@ -195,7 +194,7 @@ _Mylist _List;  // list of elements, must initialize before _Vec
 
 <p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
 
-<p><list>:
+<p><code>list</code>:
         template<class... _Valty>
             void emplace_front(_Valty&amp;&amp;&hellip; _Val)
             {   // insert element at beginning
@@ -311,9 +310,9 @@ _Mylist _List;  // list of elements, must initialize before _Vec
       
       <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="list-group-item">Dynamic vertex pulling with D3D11</a>
       
-      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
-      
       <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
       
       <a href="https://bazhenovc.github.io/blog/categories/" class="list-group-item">Categories</a>
       
