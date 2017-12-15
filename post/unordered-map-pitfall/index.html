@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>bazhenovc</title>
+
+  
+  
+  <meta name="author" content="Kirill Bazhenov" />
+  <meta name="description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+" />
+
+
+
+<meta name="generator" content="Hugo 0.31.1" />
+
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" />
+<link rel="alternative" href="/blog/index.xml" title="bazhenovc" type="application/atom+xml" />
+
+<link href="https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.css" rel="stylesheet" >
+<link rel="stylesheet" href="/css/site.css">
+
+</head>
+
+<body>
+  <div class="flip-container">
+    <div class="flipper">
+      <section class="front">
+        
+<nav class="ui top secondary menu">
+  <div class="item">
+    <i class="inverted big link bullseye icon dream-flip-toggle" title="Flip it!"></i>
+  </div>
+  <div class="item">
+    <a href="/">
+      <i class="inverted big home icon" title="Home"></i>
+    </a>
+  </div>
+</nav>
+ 
+<div class="ui centered grid">
+  <div class="fifteen wide mobile eleven wide tablet eleven wide computer column post-list">
+
+    <section class="ui secondary top attached black segment">
+      <header>
+        <h1 class="ui header">
+          Unordered Map Pitfall
+          <div class="sub header">@ Kirill Bazhenov · Dec 15, 2017 · 2 min read · Update at Dec 15, 2017</div>
+        </h1>
+      </header>
+      <article style="margin-top: 2rem; font-size: 1.4rem;"><p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
+
+<p></p>
+
+<h1 id="a-story-of-unordered-map-performance">A story of unordered_map performance</h1>
+
+<p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS unordered_map
+template&lt;class _Kty,
+    class _Ty,
+    class _Hasher = hash&lt;_Kty&gt;,
+    class _Keyeq = equal_to&lt;_Kty&gt;,
+    class _Alloc = allocator&lt;pair&lt;const _Kty, _Ty&gt; &gt; &gt;
+    class unordered_map
+        : public _Hash&lt;_Umap_traits&lt;_Kty, _Ty,
+            _Uhash_compare&lt;_Kty, _Hasher, _Keyeq&gt;, _Alloc, false&gt; &gt;
+    {   // hash table of {key, mapped} values, unique keys
+    //
+    // Irrelevant code omitted
+    //
+    template&lt; ... &gt;
+        _Pairib insert(_Valty&amp;&amp; _Val)
+        {   // insert _Val
+        return (this-&gt;emplace(_STD forward&lt;_Valty&gt;(_Val)));
+        }
+</code></pre>
+
+<p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>template&lt;class... _Valty&gt;
+    iterator emplace(_Valty&amp;&amp;... _Val)
+    {   // try to insert value_type(_Val...), favoring right side
+    return (_Mybase::emplace(_STD forward&lt;_Valty&gt;(_Val)...).first);
+    }
+</code></pre>
+
+<p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS _Hash
+template&lt;class _Traits&gt;
+    class _Hash
+    {   // hash table -- list with vector of iterators for quick access
+    //
+    // Irrelevant code omitted
+    //
+    template&lt;class... _Valty&gt;
+        _Pairib emplace(_Valty&amp;&amp;... _Val)
+        {   // try to insert value_type(_Val...)
+        _List.emplace_front(_STD forward&lt;_Valty&gt;(_Val)...);
+        return (_Insert(_List.front(), _Unchecked_begin()));
+        }
+</code></pre>
+
+<p>Oh wait, what&rsquo;s that?</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>typedef std::list&lt;...&gt; _Mylist;
+_Mylist _List;  // list of elements, must initialize before _Vec
+</code></pre>
+
+<p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
+
+<p><code>&lt;list&gt;</code>:</p>
+
+<pre><code>    template&lt;class... _Valty&gt;
+        void emplace_front(_Valty&amp;&amp;... _Val)
+        {   // insert element at beginning
+        _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)...);
+        }
+    template&lt;class... _Valty&gt;
+        void _Insert(_Unchecked_const_iterator _Where,
+        _Valty&amp;&amp;... _Val)
+        {   // insert element at _Where
+        _Nodeptr _Pnode = _Where._Mynode();
+        _Nodeptr _Newnode =
+            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode), // We're interested in this one
+                _STD forward&lt;_Valty&gt;(_Val)...);
+        // Irrelevant code omitted
+        }
+    // _Buynode
+    template&lt;class... _Valty&gt;
+    _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+        _Valty&amp;&amp;... _Val)
+        {   // allocate a node and set links and value
+        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev); // It calls _Buynode0
+        // Irrelevant code omitted
+        }
+    // _Buynode0
+    _Nodeptr _Buynode0(_Nodeptr _Next,
+    _Nodeptr _Prev)
+        {   // allocate a node and set links
+        _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
+        // Irrelevant code omitted
+        }
+</code></pre>
+
+<p>Here we go. <code>_Buynode0</code> ALWAYS makes a small memory allocation for 1 element, thus in MSVC <code>std::list</code> ALWAYS allocates memory every single time something is inserted into it, thus <code>std::unordered_map</code> ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
+
+<p>Thanks for reading!</p></article>
+    </section>
+
+    <footer class="ui secondary attached segment dream-tags">
+      
+      
+      <a class="ui label" href="/blog/tags/c&#43;&#43;" title="C&#43;&#43;">C&#43;&#43;</a>
+      
+      
+    </footer>
+
+    
+
+    
+    <footer class="ui secondary bottom attached stacked segment">
+      <div id="disqus_thread"></div>
+      <script>
+      
+
+      
+
+
+      var disqus_config = function () {
+      this.page.url = 'https:\/\/bazhenovc.github.io\/blog\/post\/unordered-map-pitfall\/';  
+      this.page.identifier = '\/blog\/post\/unordered-map-pitfall\/'; 
+      };
+
+      (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://' + 'bazhenovcsblog' + '.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+      })();
+      </script>
+      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+    </footer>
+    
+
+  </div>
+  <div class="fifteen wide mobile four wide tablet four wide computer column">
+
+    <section class="ui top attached center aligned inverted segment">
+  <div class="ui small circular image">
+    
+    <img src="">
+    
+  </div>
+  <h3 class="ui header">Kirill Bazhenov&#39;s blog<div class="sub header" style="color: white;"></div>
+  </h3>
+  <a id="tag-category-pop" class="ui red right corner label">
+    <i class="pointing down icon" title="Click this to pop tags and categories"></i>
+  </a>
+</section>
+
+
+<section class="ui attached center aligned inverted segment dream-tags">
+  
+  <a class="ui label" href="/blog/tags/c&#43;&#43;" title="c&#43;&#43;">c&#43;&#43;</a>
+  
+  <a class="ui label" href="/blog/tags/direct3d" title="direct3d">direct3d</a>
+  
+  <a class="ui label" href="/blog/tags/direct3d-11" title="direct3d-11">direct3d-11</a>
+  
+  <a class="ui label" href="/blog/tags/opengl" title="opengl">opengl</a>
+  
+</section>
+
+
+
+<section class="ui attached inverted segment dream-categories">
+  <div class="ui inverted accordion">
+    
+    <div class="title">
+      <i class="dropdown icon"></i>
+      <a href="/blog/categories/c&#43;&#43;" class="item" style="color: white;">c&#43;&#43;</a>
+    </div>
+    <div class="content">
+      <div class="ui link inverted list">
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="item">Unordered Map Pitfall</a>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    
+    <div class="title">
+      <i class="dropdown icon"></i>
+      <a href="/blog/categories/graphics" class="item" style="color: white;">graphics</a>
+    </div>
+    <div class="content">
+      <div class="ui link inverted list">
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="item">GPU Driven Occlusion Culling in Life is Feudal</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="item">Dynamic vertex pulling with D3D11</a>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    
+    <div class="title">
+      <i class="dropdown icon"></i>
+      <a href="/blog/categories/programming" class="item" style="color: white;">programming</a>
+    </div>
+    <div class="content">
+      <div class="ui link inverted list">
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="item">Unordered Map Pitfall</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="item">GPU Driven Occlusion Culling in Life is Feudal</a>
+        </div>
+      </div>
+      
+      <div class="item" style="padding-left: 24px;">
+        <i class="cocktail icon"></i>
+        <div class="content">
+          <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="item">Dynamic vertex pulling with D3D11</a>
+        </div>
+      </div>
+      
+      </div>
+    </div>
+    
+  </div>
+</section>
+
+
+<section class="ui bottom attached center aligned inverted segment">
+    <p>© 2017 bazhenovc</p>
+    <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</p>
+</section>
+
+  </div>
+</div>
+
+      </section>
+      <section class="back">
+        <nav class="ui top secondary menu" style="overflow: scroll">
+  <div class="item">
+    <i class="inverted big link bullseye icon dream-flip-toggle" title="Flip it!"></i>
+  </div>
+  
+  
+  
+  
+  
+</nav>
+
+<div class="ui centered grid">
+  <div class="fifteen wide mobile fifteen wide tablet fifteen wide computer column">
+
+    <section class="ui stacked segments about">
+      <header class="ui inverted segment">
+        <h2 class="ui header">About me</h2>
+      </header>
+
+      <article class="ui inverted segment">
+        
+      </article>
+
+      
+
+      
+      <footer class="ui secondary segment">
+        <div id="disqus_thread"></div>
+        <script>
+        
+
+        
+
+
+        var disqus_config = function () {
+        this.page.url = 'https:\/\/bazhenovc.github.io\/blog\/post\/unordered-map-pitfall\//about';  
+        this.page.identifier = '/about'; 
+        };
+
+        (function() { 
+        var d = document, s = d.createElement('script');
+        s.src = 'https://' + 'bazhenovcsblog' + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+        })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+      </footer>
+      
+    </section>
+
+  </div>
+</div>
+
+      </section>
+    </div>
+  </div>
+
+  
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"></script>
+<script src="/js/bg.js"></script>
+<script src="/js/site.js"></script>
+
+
+</body>
+
+</html>
