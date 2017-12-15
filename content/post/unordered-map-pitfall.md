@@ -16,7 +16,7 @@ std::unordered_map implementation in MSVC has a major performance issue.
 
 Let's take a closer look at it. MSVC version is 2015, other versions are probably affected as well.
 
-`cpp unordered_map`:
+`unordered_map`:
 
             // TEMPLATE CLASS unordered_map
     template<class _Kty,
