@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="Kirill Bazhenov" />
+<meta name="description" content="Personal blog." />
+<meta name="keywords" content="blog, tech" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+<base href="https://bazhenovc.github.io/blog/" />
+<meta property="og:title" content="Unordered Map Pitfall" />
+<meta property="og:description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" />
+
+
+
+<meta property="article:published_time" content="2017-12-15T17:54:23&#43;03:00"/>
+
+<meta property="article:modified_time" content="2017-12-15T17:54:23&#43;03:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Unordered Map Pitfall"/>
+<meta name="twitter:description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+"/>
+
+
+
+<meta itemprop="name" content="Unordered Map Pitfall">
+<meta itemprop="description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+">
+
+
+<meta itemprop="datePublished" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="dateModified" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="wordCount" content="419">
+
+
+
+<meta itemprop="keywords" content="C&#43;&#43;," />
+
+
+<link rel="stylesheet" href="css/layout.css" />
+<style type="text/css">
+body {
+  background-color: #101010;
+  color: #dbdbdb;
+}
+
+a { color: #dbdbdb; }
+
+pre {
+  background: #1D1F21;
+  border: 1px solid #dbdbdb;
+  border-radius: 5px;
+}
+
+code {
+  background: #1D1F21;
+}
+
+blockquote {
+  background: #1D1F21;
+  border-left: 3px solid #dbdbdb;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #dbdbdb;
+}
+
+th {
+  background: #dbdbdb;
+  color: #101010;
+}
+
+.siteTitle a { color: #99cc66; }
+
+.post .content h1{ color: #99cc66; }
+.post .content h2{ color: #99cc66; }
+.post .content h3{ color: #99cc66; }
+.post .content h4{ color: #99cc66; }
+.post .content h5{ color: #99cc66; }
+.post .content h6{ color: #99cc66; }
+.post .content a:hover { color: #99cc66; }
+.social-link:hover { color: #99cc66; }
+.nav-item-title:hover { color: #99cc66; }
+.tag a:hover { color: #99cc66; }
+.copyright { color: #404040 }
+.poweredby { color: #404040 }
+.poweredby a { color: #404040; }
+.post-preview .title a{ color: #99cc66; }
+.content-item a:hover{
+  text-decoration: underline;
+  color: #99cc66;
+}
+.post-list .title { color: #99cc66; }
+.rmore { color: #99cc66; }
+.terms .term a:hover {
+  text-decoration: underline;
+  color: #99cc66;
+}
+
+</style>
+
+
+
+<title>
+
+
+     Unordered Map Pitfall 
+
+</title>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+    </div> 
+
+    
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/post/"><div class="nav-item-title">Posts</div></a>
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/tags/"><div class="nav-item-title">Tags</div></a>
+    
+
+  </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+  <a href="mailto:myemail"><div class="social-link">email</div></a>
+  
+
+  
+  <a href="https://github.com/github%20id" target="_blank"><div class="social-link">gh</div></a>
+  
+
+  
+  <a href="https://gitlab.com/gitlab%20id" target="_blank"><div class="social-link">gl</div></a>
+  
+
+  
+  <a href="https://twitter.com/twitter%20id" target="_blank"><div class="social-link">twtr</div></a>
+  
+
+  
+  <a href="https://www.linkedin.com/in/linkedin%20id" target="_blank"><div class="social-link">in</div></a>
+  
+
+</div>
+
+
+</header>
+
+
+<article class="post">
+    <h1 class="title"> Unordered Map Pitfall </h1>
+    <div class="content"> <p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
+
+<p></p>
+
+<h1 id="a-story-of-unordered-map-performance">A story of unordered_map performance</h1>
+
+<p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS unordered_map
+template&lt;class _Kty,
+    class _Ty,
+    class _Hasher = hash&lt;_Kty&gt;,
+    class _Keyeq = equal_to&lt;_Kty&gt;,
+    class _Alloc = allocator&lt;pair&lt;const _Kty, _Ty&gt; &gt; &gt;
+    class unordered_map
+        : public _Hash&lt;_Umap_traits&lt;_Kty, _Ty,
+            _Uhash_compare&lt;_Kty, _Hasher, _Keyeq&gt;, _Alloc, false&gt; &gt;
+    {   // hash table of {key, mapped} values, unique keys
+    //
+    // Irrelevant code omitted
+    //
+    template&lt; ... &gt;
+        _Pairib insert(_Valty&amp;&amp; _Val)
+        {   // insert _Val
+        return (this-&gt;emplace(_STD forward&lt;_Valty&gt;(_Val)));
+        }
+</code></pre>
+
+<p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>template&lt;class... _Valty&gt;
+    iterator emplace(_Valty&amp;&amp;... _Val)
+    {   // try to insert value_type(_Val...), favoring right side
+    return (_Mybase::emplace(_STD forward&lt;_Valty&gt;(_Val)...).first);
+    }
+</code></pre>
+
+<p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS _Hash
+template&lt;class _Traits&gt;
+    class _Hash
+    {   // hash table -- list with vector of iterators for quick access
+    //
+    // Irrelevant code omitted
+    //
+    template&lt;class... _Valty&gt;
+        _Pairib emplace(_Valty&amp;&amp;... _Val)
+        {   // try to insert value_type(_Val...)
+        _List.emplace_front(_STD forward&lt;_Valty&gt;(_Val)...);
+        return (_Insert(_List.front(), _Unchecked_begin()));
+        }
+</code></pre>
+
+<p>Oh wait, what&rsquo;s that?</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>typedef std::list&lt;...&gt; _Mylist;
+_Mylist _List;  // list of elements, must initialize before _Vec
+</code></pre>
+
+<p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
+
+<p><code>&lt;list&gt;</code>:</p>
+
+<pre><code>    template&lt;class... _Valty&gt;
+        void emplace_front(_Valty&amp;&amp;... _Val)
+        {   // insert element at beginning
+        _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)...);
+        }
+    template&lt;class... _Valty&gt;
+        void _Insert(_Unchecked_const_iterator _Where,
+        _Valty&amp;&amp;... _Val)
+        {   // insert element at _Where
+        _Nodeptr _Pnode = _Where._Mynode();
+        _Nodeptr _Newnode =
+            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode), // We're interested in this one
+                _STD forward&lt;_Valty&gt;(_Val)...);
+        // Irrelevant code omitted
+        }
+    // _Buynode
+    template&lt;class... _Valty&gt;
+    _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+        _Valty&amp;&amp;... _Val)
+        {   // allocate a node and set links and value
+        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev); // It calls _Buynode0
+        // Irrelevant code omitted
+        }
+    // _Buynode0
+    _Nodeptr _Buynode0(_Nodeptr _Next,
+    _Nodeptr _Prev)
+        {   // allocate a node and set links
+        _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
+        // Irrelevant code omitted
+        }
+</code></pre>
+
+<p>Here we go. <code>_Buynode0</code> ALWAYS makes a small memory allocation for 1 element, thus in MSVC <code>std::list</code> ALWAYS allocates memory every single time something is inserted into it, thus <code>std::unordered_map</code> ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
+
+<p>Thanks for reading!</p> </div>
+    <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;">#C&#43;&#43;</a>
+      </div>
+    
+</div>
+
+    <div class="date"> Dec 15, 2017 </div>
+  </div>
+
+</footer>
+
+
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</article>
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+  <a href="mailto:myemail"><div class="social-link">Email</div></a>
+  
+
+  
+  <a href="https://github.com/github%20id" target="_blank"><div class="social-link">GitHub</div></a>
+  
+
+  
+  <a href="https://gitlab.com/gitlab%20id" target="_blank"><div class="social-link">GitLab</div></a>
+  
+
+  
+  <a href="https://twitter.com/twitter%20id" target="_blank"><div class="social-link">Twitter</div></a>
+  
+
+  
+  <a href="https://www.linkedin.com/in/linkedin%20id" target="_blank"><div class="social-link">LinkedIn</div></a>
+  
+
+  <div class="social-link">
+  <a href="https://bazhenovc.github.io/blog/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> Copyright (c) 2017, all rights reserved. </div>
+
+  <div class="poweredby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>.
+  </div>
+
+  </footer>
+
+</div> 
+
+</body>
+</html>
+
