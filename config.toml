@@ -2,4 +2,16 @@ languageCode = "en-us"
 title = "bazhenovc"
 baseurl = "https://bazhenovc.github.io/blog/"
 disqusShortname = "bazhenovcsblog"
-theme = "base16"
+theme = "dream"
+
+[params]
+  author = "Kirill Bazhenov" // Site author or as default article author
+  motto = ""
+  description = "Game development rants" // <meta name="description" content="">
+  avatar = "" // your logo
+
+  email = ""
+  github = ""
+  linkedin = ""
+  codepen = ""
+  stackoverflow = ""
