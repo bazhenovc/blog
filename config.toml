@@ -5,10 +5,10 @@ disqusShortname = "bazhenovcsblog"
 theme = "dream"
 
 [params]
-  author = "Kirill Bazhenov" // Site author or as default article author
+  author = "Kirill Bazhenov"
   motto = ""
-  description = "Game development rants" // <meta name="description" content="">
-  avatar = "" // your logo
+  description = "Game development rants"
+  avatar = ""
 
   email = ""
   github = ""
