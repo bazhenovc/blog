@@ -29,8 +29,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
         //
         // Irrelevant code omitted
         //
-        template<class _Valty,
-            class = enable_if_t<is_constructible<value_type, _Valty>::value> >
+        template< ... >
             _Pairib insert(_Valty&& _Val)
             {   // insert _Val
             return (this->emplace(_STD forward<_Valty>(_Val)));
@@ -38,7 +37,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
 
 So, insert() calls this->emplace(...). Let's examine that method too:
 
-<unordered_map>:
+`unordered_map`:
 
     template<class... _Valty>
         iterator emplace(_Valty&&... _Val)
@@ -48,7 +47,7 @@ So, insert() calls this->emplace(...). Let's examine that method too:
 
 That routes it to _Mybase::emplace. So far nothing too criminal, but let's look for that as well.
 
-<xhash>:
+`xhash`:
 
             // TEMPLATE CLASS _Hash
     template<class _Traits>
@@ -71,7 +70,7 @@ Oh wait, what's that?
 
 std::unordered_map uses std::list internally. Let's take a look at its methods as well:
 
-<list>:
+`list`:
         template<class... _Valty>
             void emplace_front(_Valty&&... _Val)
             {   // insert element at beginning
