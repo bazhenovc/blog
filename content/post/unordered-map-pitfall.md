@@ -87,7 +87,7 @@ std::unordered_map uses std::list internally. Let's take a look at its methods a
             {   // insert element at _Where
             _Nodeptr _Pnode = _Where._Mynode();
             _Nodeptr _Newnode =
-                this->_Buynode(_Pnode, this->_Prevnode(_Pnode),     /// We're interested in this one
+                this->_Buynode(_Pnode, this->_Prevnode(_Pnode), // We're interested in this one
                     _STD forward<_Valty>(_Val)...);
             // Irrelevant code omitted
             }
@@ -96,14 +96,14 @@ std::unordered_map uses std::list internally. Let's take a look at its methods a
         _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
             _Valty&&... _Val)
             {   // allocate a node and set links and value
-            _Nodeptr _Pnode = this->_Buynode0(_Next, _Prev);        /// It calls _Buynode0
+            _Nodeptr _Pnode = this->_Buynode0(_Next, _Prev); // It calls _Buynode0
             // Irrelevant code omitted
             }
         // _Buynode0
         _Nodeptr _Buynode0(_Nodeptr _Next,
         _Nodeptr _Prev)
             {   // allocate a node and set links
-            _Nodeptr _Pnode = _Getal().allocate(1);                 // Whoa hello there!
+            _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
             // Irrelevant code omitted
             }
 
