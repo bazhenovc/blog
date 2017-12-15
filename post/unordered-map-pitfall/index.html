@@ -211,7 +211,7 @@ _Mylist _List;  // list of elements, must initialize before _Vec
         {   // insert element at _Where
         _Nodeptr _Pnode = _Where._Mynode();
         _Nodeptr _Newnode =
-            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode),     /// We're interested in this one
+            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode), // We're interested in this one
                 _STD forward&lt;_Valty&gt;(_Val)...);
         // Irrelevant code omitted
         }
@@ -220,14 +220,14 @@ _Mylist _List;  // list of elements, must initialize before _Vec
     _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
         _Valty&amp;&amp;... _Val)
         {   // allocate a node and set links and value
-        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev);        /// It calls _Buynode0
+        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev); // It calls _Buynode0
         // Irrelevant code omitted
         }
     // _Buynode0
     _Nodeptr _Buynode0(_Nodeptr _Next,
     _Nodeptr _Prev)
         {   // allocate a node and set links
-        _Nodeptr _Pnode = _Getal().allocate(1);                 // Whoa hello there!
+        _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
         // Irrelevant code omitted
         }
 </code></pre>
