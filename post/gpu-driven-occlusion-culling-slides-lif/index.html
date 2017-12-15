@@ -1,19 +1,17 @@
 <!DOCTYPE html>
 <html lang="en-us">
+
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
-  <title>GPU Driven Occlusion Culling in Life is Feudal &middot; bazhenovc - </title>
-  <meta name="generator" content="Hugo 0.31.1" />
-  
+<meta charset="utf-8" />
+<meta name="author" content="" />
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
 
-  <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="GPU Driven Occlusion Culling in Life is Feudal"/>
-<meta name="twitter:description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
-
-"/>
-
-  <meta property="og:title" content="GPU Driven Occlusion Culling in Life is Feudal" />
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/">
+<base href="https://bazhenovc.github.io/blog/" />
+<meta property="og:title" content="GPU Driven Occlusion Culling in Life is Feudal" />
 <meta property="og:description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
 
 " />
@@ -36,10 +34,13 @@
 
 
 
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="GPU Driven Occlusion Culling in Life is Feudal"/>
+<meta name="twitter:description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
 
-  <!-- RSS autodiscovery --> 
+"/>
 
-  
+
+
 <meta itemprop="name" content="GPU Driven Occlusion Culling in Life is Feudal">
 <meta itemprop="description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
 
@@ -54,81 +55,125 @@
 
 <meta itemprop="keywords" content="Direct3D,Direct3D 11,OpenGL," />
 
-  <link href="https://fonts.googleapis.com/css?family=Lato:400" rel="stylesheet">
-  <link rel="stylesheet" href="https://bazhenovc.github.io/blog/css/style.css">
-  <script type="application/ld+json">
-{
-  "@context": "http://schema.org",
-  "@type": "WebSite",
-  "name": "bazhenovc",
-  "url": "https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/"
+
+<link rel="stylesheet" href="css/layout.css" />
+<style type="text/css">
+body {
+  background-color: <no value>;
+  color: <no value>;
 }
-</script>
+
+a { color: <no value>; }
+
+pre {
+  background: <no value>;
+  border: 1px solid <no value>;
+  border-radius: 5px;
+}
+
+code {
+  background: <no value>;
+}
+
+blockquote {
+  background: <no value>;
+  border-left: 3px solid <no value>;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid <no value>;
+}
+
+th {
+  background: <no value>;
+  color: <no value>;
+}
+
+.siteTitle a { color: <no value>; }
+
+.post .content h1{ color: <no value>; }
+.post .content h2{ color: <no value>; }
+.post .content h3{ color: <no value>; }
+.post .content h4{ color: <no value>; }
+.post .content h5{ color: <no value>; }
+.post .content h6{ color: <no value>; }
+.post .content a:hover { color: <no value>; }
+.social-link:hover { color: <no value>; }
+.nav-item-title:hover { color: <no value>; }
+.tag a:hover { color: <no value>; }
+.copyright { color: <no value> }
+.poweredby { color: <no value> }
+.poweredby a { color: <no value>; }
+.post-preview .title a{ color: <no value>; }
+.content-item a:hover{
+  text-decoration: underline;
+  color: <no value>;
+}
+.post-list .title { color: <no value>; }
+.rmore { color: <no value>; }
+.terms .term a:hover {
+  text-decoration: underline;
+  color: <no value>;
+}
+
+</style>
+
+
+
+<title>
+
+
+     GPU Driven Occlusion Culling in Life is Feudal 
+
+</title>
 
 </head>
 
+
 <body>
-  <header class="gheader">
-  <div class="container">
-    <nav class="navbar ">
-      <div class="navbar-brand">
-        <a class="navbar-item" href="https://bazhenovc.github.io/blog/">
-          <h1 class="brand">bazhenovc</h1>
-        </a>
+<div class="main">
+<header>
 
-        <div class="navbar-burger burger" data-target="navMenubd-example">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-      </div>
+<div class="header-bar">
 
-      <div id="navMenubd-example" class="navbar-menu">
-        <div class="navbar-start">
-          
-        </div>
-      </div>
-    </nav>
-  </div>
+  <nav>
+    <div class="siteTitle">
+      <a href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+    </div> 
+
+    
+    
+
+  </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
 </header>
 
 
-  <div class="main-content">
-    <div class="container">
-      
-  <article class="post">
-    <header class="post-header">
-      <h1 class="title">GPU Driven Occlusion Culling in Life is Feudal</h1>
-      <div class="meta">
-        <time class="pub-time"  datetime="2017-02-02T03:26:00&#43;03:00">
-          2017.02.02
-        </time>
-        <div class="terms">
-          
-          <div class="categories">
-            
-              <a class="categories-item" href="/blog/categories/programming">Programming</a>
-            
-              <a class="categories-item" href="/blog/categories/graphics">Graphics</a>
-            
-          </div>
-          
-          
-          <div class="tag">
-            
-              <a class="tag-item" href="/blog/tags/direct3d">Direct3D</a>
-            
-              <a class="tag-item" href="/blog/tags/direct3d-11">Direct3D 11</a>
-            
-              <a class="tag-item" href="/blog/tags/opengl">OpenGL</a>
-            
-          </div>
-          
-        </div>
-      </div>
-    </header>
-    <div class="post-body">
-      <p>In 2016 I gave a small talk in Dublin, Ireland about the subj, here are <a href="https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/">the slides</a> and below you can find a more or less human-readable version of the slides above.</p>
+<article class="post">
+    <h1 class="title"> GPU Driven Occlusion Culling in Life is Feudal </h1>
+    <div class="content"> <p>In 2016 I gave a small talk in Dublin, Ireland about the subj, here are <a href="https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/">the slides</a> and below you can find a more or less human-readable version of the slides above.</p>
 
 <p></p>
 
@@ -530,106 +575,88 @@
 
 <p>Here&rsquo;s a nice DrawIndirect-related driver bug that I&rsquo;ve found worth sharing:</p>
 
-<p><img src="/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p>
-    </div>
+<p><img src="/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p> </div>
     <footer class="post-footer">
-      
-      <div class="share">
-        
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+      <div class="tag">
+        <a href="/tags/direct3d">#Direct3D</a>
       </div>
-
-      <div class="pagenation">
-        <ul class="pagenation-list">
-          
-          <li class="pager previous">
-            <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" data-toggle="tooltip" data-placement="top" title="Dynamic vertex pulling with D3D11">&larr; Previous Post</a>
-          </li>
-          
-          
-          <li class="pager next">
-            <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" data-toggle="tooltip" data-placement="top" title="Unordered Map Pitfall">Next Post &rarr;</a>
-          </li>
-          
-        </ul>
+    
+      <div class="tag">
+        <a href="/tags/direct3d-11">#Direct3D 11</a>
       </div>
-    </footer>
-  </article>
+    
+      <div class="tag">
+        <a href="/tags/opengl">#OpenGL</a>
+      </div>
+    
+</div>
 
-  
-  <article class="related"></article>
-
-  <script type="application/ld+json">
-{
-  "@context": "http://schema.org",
-  "@type": "NewsArticle",
-  "mainEntityOfPage": {
-    "@type": "NewsArticle",
-    "@id": "https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/",
-    "headline": "In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a mo",
-    "author": "",
-    "publisher": {
-      "@type": "Organization",
-      "name": "",
-      "logo": ""
-    },
-    "image": "",
-    "datePublished": "2017-02-02"
-  },
-  "headline": "In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a mo",
-  "alternativeHeadline": "bazhenovc",
-  "datePublished": "2017-02-02",
-  "dateModified": "2017-02-02",
-  "url": "https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/",
-  "wordCount": "1526",
-  "author": {
-    "@type": "Person",
-    "name": ""
-  },
-  "publisher": {
-    "@type": "Organization",
-    "name": ""
-  },
-  "image": "",
-  "genre": "ProgrammingGraphics",
-  "keywords": "Direct3DDirect3D 11OpenGL",
-  "description": ""
-}
-</script>
-
-  <script type="application/ld+json">
-{
-  "@context": "http://schema.org",
-  "@type": "Person",
-  "@id": "https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/",
-  "name": ""
-}
-</script>
-
-
-    </div>
+    <div class="date"> Feb 2, 2017 </div>
   </div>
 
-  <footer class="gfooter">
-  <div class="inner">
-    <div class="container">
-      <p class="copy"><small></small></p>
-
-      <nav class="footer-nav">
-        <div class="inner">
-          
-        </div>
-      </nav>
-    </div>
-  </div>
 </footer>
 
 
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
 
-<script
-  src="https://code.jquery.com/jquery-3.2.1.min.js"
-  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
-  crossorigin="anonymous"></script>
-<script src="https://bazhenovc.github.io/blog/js/script.js"></script>
+
+</article>
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://bazhenovc.github.io/blog/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright">  </div>
+
+  <div class="poweredby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>.
+  </div>
+
+  </footer>
+
+</div> 
 
 </body>
 </html>
+
