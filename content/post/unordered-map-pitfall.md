@@ -12,6 +12,8 @@ std::unordered_map implementation in MSVC has a major performance issue.
 
 <!--more-->
 
+# A story of unordered_map performance
+
 Let's take a closer look at it. MSVC version is 2015, other versions are probably affected as well.
 
 `unordered_map`:
@@ -35,7 +37,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
             return (this->emplace(_STD forward<_Valty>(_Val)));
             }
 
-So, insert() calls this->emplace(...). Let's examine that method too:
+So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
 `unordered_map`:
 
@@ -45,7 +47,7 @@ So, insert() calls this->emplace(...). Let's examine that method too:
         return (_Mybase::emplace(_STD forward<_Valty>(_Val)...).first);
         }
 
-That routes it to _Mybase::emplace. So far nothing too criminal, but let's look for that as well.
+That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's look for that as well.
 
 `xhash`:
 
@@ -71,6 +73,7 @@ Oh wait, what's that?
 std::unordered_map uses std::list internally. Let's take a look at its methods as well:
 
 `list`:
+
         template<class... _Valty>
             void emplace_front(_Valty&&... _Val)
             {   // insert element at beginning
@@ -102,8 +105,10 @@ std::unordered_map uses std::list internally. Let's take a look at its methods a
             // Irrelevant code omitted
             }
 
-Here we go. _Buynode0 ALWAYS makes a small memory allocation for 1 element, thus in MSVC std::list ALWAYS allocates memory every single time something is inserted into it, thus std::unordered_map ALWAYS allocates memory when new element is successfully inserted into it.
+Here we go. `_Buynode0` ALWAYS makes a small memory allocation for 1 element, thus in MSVC `std::list` ALWAYS allocates memory every single time something is inserted into it, thus `std::unordered_map` ALWAYS allocates memory when new element is successfully inserted into it.
 
-I hope that I don't need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual insert() call.
+# Conclusions
+
+I hope that I don't need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual `insert()` call.
 
 Thanks for reading!
