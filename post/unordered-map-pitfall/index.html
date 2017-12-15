@@ -132,6 +132,8 @@
 
 <p></p>
 
+<h1 id="a-story-of-unordered-map-performance">A story of unordered_map performance</h1>
+
 <p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
 
 <p><code>unordered_map</code>:</p>
@@ -156,7 +158,7 @@ template&lt;class _Kty,
         }
 </code></pre>
 
-<p>So, insert() calls this-&gt;emplace(&hellip;). Let&rsquo;s examine that method too:</p>
+<p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
 
 <p><code>unordered_map</code>:</p>
 
@@ -167,7 +169,7 @@ template&lt;class _Kty,
     }
 </code></pre>
 
-<p>That routes it to _Mybase::emplace. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+<p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
 
 <p><code>xhash</code>:</p>
 
@@ -194,41 +196,45 @@ _Mylist _List;  // list of elements, must initialize before _Vec
 
 <p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
 
-<p><code>list</code>:
-        template<class... _Valty>
-            void emplace_front(_Valty&amp;&amp;&hellip; _Val)
-            {   // insert element at beginning
-            _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)&hellip;);
-            }
-        template<class... _Valty>
-            void _Insert(_Unchecked_const_iterator _Where,
-            _Valty&amp;&amp;&hellip; _Val)
-            {   // insert element at _Where
-            _Nodeptr _Pnode = _Where._Mynode();
-            _Nodeptr _Newnode =
-                this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode),     /// We&rsquo;re interested in this one
-                    _STD forward&lt;_Valty&gt;(_Val)&hellip;);
-            // Irrelevant code omitted
-            }
-        // _Buynode
-        template<class... _Valty>
-        _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
-            _Valty&amp;&amp;&hellip; _Val)
-            {   // allocate a node and set links and value
-            _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev);        /// It calls _Buynode0
-            // Irrelevant code omitted
-            }
-        // _Buynode0
-        _Nodeptr _Buynode0(_Nodeptr _Next,
-        _Nodeptr _Prev)
-            {   // allocate a node and set links
-            _Nodeptr _Pnode = _Getal().allocate(1);
-            // Irrelevant code omitted
-            }</p>
+<p><code>list</code>:</p>
 
-<p>Here we go. _Buynode0 ALWAYS makes a small memory allocation for 1 element, thus in MSVC std::list ALWAYS allocates memory every single time something is inserted into it, thus std::unordered_map ALWAYS allocates memory when new element is successfully inserted into it.</p>
+<pre><code>    template&lt;class... _Valty&gt;
+        void emplace_front(_Valty&amp;&amp;... _Val)
+        {   // insert element at beginning
+        _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)...);
+        }
+    template&lt;class... _Valty&gt;
+        void _Insert(_Unchecked_const_iterator _Where,
+        _Valty&amp;&amp;... _Val)
+        {   // insert element at _Where
+        _Nodeptr _Pnode = _Where._Mynode();
+        _Nodeptr _Newnode =
+            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode),     /// We're interested in this one
+                _STD forward&lt;_Valty&gt;(_Val)...);
+        // Irrelevant code omitted
+        }
+    // _Buynode
+    template&lt;class... _Valty&gt;
+    _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+        _Valty&amp;&amp;... _Val)
+        {   // allocate a node and set links and value
+        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev);        /// It calls _Buynode0
+        // Irrelevant code omitted
+        }
+    // _Buynode0
+    _Nodeptr _Buynode0(_Nodeptr _Next,
+    _Nodeptr _Prev)
+        {   // allocate a node and set links
+        _Nodeptr _Pnode = _Getal().allocate(1);
+        // Irrelevant code omitted
+        }
+</code></pre>
 
-<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual insert() call.</p>
+<p>Here we go. <code>_Buynode0</code> ALWAYS makes a small memory allocation for 1 element, thus in MSVC <code>std::list</code> ALWAYS allocates memory every single time something is inserted into it, thus <code>std::unordered_map</code> ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
 
 <p>Thanks for reading!</p></div>
 
@@ -310,9 +316,9 @@ _Mylist _List;  // list of elements, must initialize before _Vec
       
       <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="list-group-item">Dynamic vertex pulling with D3D11</a>
       
-      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
-      
       <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
       
       <a href="https://bazhenovc.github.io/blog/categories/" class="list-group-item">Categories</a>
       
