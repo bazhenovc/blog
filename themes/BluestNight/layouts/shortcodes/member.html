@@ -1,0 +1,9 @@
+{{ if .IsNamedParams }}
+	{{ $.Scratch.Set "name" (.Get "name") }}
+	{{ $.Scratch.Set "noborder" (eq "true" (.Get "noborder")) }}
+{{ else }}
+	{{ $.Scratch.Set "name" (.Get 0) }}
+	{{ $.Scratch.Set "noborder" false }}
+{{ end }}
+
+{{- partial "memberbox.html" (dict "Scratch" .Scratch "Members" $.Site.Data.members "Member" ($.Scratch.Get "name") "NoBorder" ($.Scratch.Get "noborder")) -}}

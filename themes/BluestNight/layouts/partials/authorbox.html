@@ -1,0 +1,10 @@
+{{- if and ($.Site.Params.authorbox) (not $.Params.hide_authorbox) -}}
+  {{- with $.Site.Params.author -}}{{- $.Scratch.Set "author" . -}}{{- end -}}
+  {{- with .Params.author -}}{{- $.Scratch.Set "author" . -}}{{- end -}}
+  {{- $author := $.Scratch.Get "author" | default "" -}}
+  {{- if ne $author "" -}}
+    {{- .Scratch.Set "itemprop" "author" -}}
+    {{- if eq .Section "events" -}}{{- .Scratch.Set "itemprop" "organizer" -}}{{- end -}}
+    {{- partial "memberbox.html" (dict "Scratch" .Scratch "Members" $.Site.Data.members "Member" $author "IsAuthor" true "ItemProp" (.Scratch.Get "itemprop")) -}}
+  {{- end -}}
+{{- end -}}

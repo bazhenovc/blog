@@ -1,0 +1,25 @@
+{{- range $.Members -}}
+  {{- if eq .Name $.Member -}}
+  {{- $.Scratch.Set "found" true -}}
+  <div {{ if $.IsAuthor }}id="authorbox" {{ end }}class="row vcenter memberbox{{ if $.NoBorder }} no-border{{ end }}" {{ with $.ItemProp }}itemprop="{{ . }}" itemscope {{ end }}itemtype="http://schema.org/Person">
+    <div class="row-item member-avatar" itemprop="image" itemscope itemtype="http://schema.org/ImageObject">
+        <img alt="{{ .Name }} avatar" src="{{ with .Img }}{{ . | absURL }}{{ else }}{{ "images/profile.jpg" | absURL }}{{ end }}" itemprop="contentUrl" />
+    </div>
+    <div class="row-item member-bio">
+      <div>
+        <span class="widget-title">About {{ with .URL }}<a href="{{ . | absLangURL }}" {{ if $.IsAuthor }}rel="author"{{ end }}>{{ end }}<span itemprop="name">{{ .Name }}</span>{{ if .URL }}</a>{{ end }}</span>
+      </div>
+      <p itemprop="description">
+        {{- .Bio | markdownify -}}
+      </p>
+      <div class="social row">
+        {{ partialCached "social-icons.html" (dict "Scratch" $.Scratch "Social" .social "IsMember" true) .Name }}
+      </div>
+    </div>
+
+  </div>
+  {{- end -}}
+{{- end -}}
+{{- if not ($.Scratch.Get "found") -}}
+  {{- errorf "Could not find member with name %s" $.Member -}}
+{{- end -}}

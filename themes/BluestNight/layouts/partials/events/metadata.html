@@ -1,0 +1,47 @@
+{{ if not .Params.start_date }}
+  {{ errorf "Start datetime for an event must be set" "" }}
+{{ else if not .Params.end_date }}
+  {{ errorf "End datetime for an event must be set" "" }}
+{{ end }}
+
+{{ if (eq (dateFormat "2006-01-02" .Params.start_date) (dateFormat "2006-01-02" .Params.end_date)) }}
+  {{ if .Params.start_date }}
+  <span class="row-item small-full">
+    <span class="fa fa-calendar"></span>
+    <strong>Date:</strong>
+    {{ dateFormat "January 2, 2006" .Params.start_date }}
+  </span>
+  <span class="row-item small-full">
+    <span class="fa fa-clock-o"></span>
+    <strong>Time:</strong>
+    <time datetime="{{ dateFormat "2006-01-02T15:04:05" .Params.start_date }}" content="{{ dateFormat "2006-01-02T15:04:05" .Params.start_date }}" itemprop="startDate">{{ dateFormat "3:04:05 PM" .Params.start_date }}</time>
+    to
+    <time datetime="{{ dateFormat "2006-01-02T15:04:05" .Params.end_date }}" content="{{ dateFormat "2006-01-02T15:04:05" .Params.end_date }}" itemprop="startDate">{{ dateFormat "3:04:05 PM" .Params.end_date }}</time>
+  </span>
+  {{ end }}
+{{ else }}
+  <span class="row-item small-full">
+    <span class="fa fa-calendar"></span>
+    {{ if .Params.start_date }}
+    <time datetime="{{ dateFormat "2006-01-02T15:04:05" .Params.start_date }}" content="{{ dateFormat "2006-01-02T15:04:05" .Params.start_date }}" itemprop="startDate"><strong>Start:</strong> {{ dateFormat "January 2, 2006 at 3:04:05 PM" .Params.start_date }}</time>
+    {{ end }}
+  </span>
+  <span class="row-item small-full">
+    <span class="fa fa-calendar"></span>
+    {{ if .Params.end_date }}
+    <time datetime="{{ dateFormat "2006-01-02T15:04:05" .Params.end_date }}" content="{{ dateFormat "2006-01-02T15:04:05" .Params.end_date }}" itemprop="endDate"><strong>End:</strong> {{ dateFormat "January 2, 2006 at 3:04:05 PM" .Params.end_date }}</time>
+    {{ end }}
+  </span>
+{{ end }}
+{{ if and (.Params.doors_open) (ne .Params.doors_open .Params.start_date) }}
+<span class="row-item small-full">
+  <span class="fa fa-building"></span>
+  <time datetime="{{ dateFormat "2006-01-02T15:04:05" .Params.doors_open }}" content="{{ dateFormat "2006-01-02T15:04:05" .Params.doors_open }}" itemprop="doorTime"><strong>Doors Open:</strong> {{ dateFormat "January 2, 2006 at 3:04:05 PM" .Params.doors_open }}</time>
+</span>
+{{ end }}
+{{ with .Params.location }}
+<span class="row-item small-full">
+  <span class="fa fa-map-marker"></span>
+  &nbsp;<strong>Location:</strong> <span itemprop="location">{{ . }}</span>
+</span>
+{{ end }}

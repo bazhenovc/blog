@@ -1,0 +1,18 @@
+{{- if $.Site.Params.iubenda.pro.enable_pro -}}
+  {{- with $.Site.Params.iubenda.id -}}
+    {{- $content := getJSON (add (add "http://www.iubenda.com/api/privacy-policy/" .) "/no-markup") -}}
+    {{- if $content.success -}}
+      {{- $content.content | replaceRE "<h1>(.*)</h1>" "" | safeHTML -}}
+    {{- else -}}
+      {{- if $.Site.Params.iubenda.pro.ignore_failed_download -}}
+        <a href="//www.iubenda.com/privacy-policy/{{ . }}" class="iubenda-nostyle no-brand iub-body-embed iub-legal-only iub-no-markup iubenda-embed" title="Privacy Policy">Privacy Policy</a><script type="text/javascript">(function (w,d) {var loader = function () {var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "//cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s,tag);}; if(w.addEventListener){w.addEventListener("load", loader, false);}else if(w.attachEvent){w.attachEvent("onload", loader);}else{w.onload = loader;}})(window, document);</script>
+      {{- else -}}
+        {{- errorf "Failed to fetch the content of the Privacy Policy." -}}
+      {{- end -}}
+    {{- end -}}
+  {{- else -}}
+    {{- errorf "Iubenda id is necessary to use Iubenda features." -}}
+  {{- end -}}
+{{- else -}}
+  {{- errorf "Iubenda pro features are not enabled. Pro features must be enabled to use the iubenda shortcode." -}}
+{{- end -}}

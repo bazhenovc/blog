@@ -1,0 +1,31 @@
+<article itemprop="events" itemscope itemtype="http://schema.org/Event">
+  {{- if .Params.thumbnail -}}
+  <div>
+    <figure>
+      <a href="{{ .Permalink }}">
+        <img src="{{ .Params.thumbnail | absURL }}" alt="{{ .Title }}" />
+      </a>
+    </figure>
+  </div>
+  {{- end -}}
+  <div>
+    <header class="post-list-title">
+      <a href="{{ .Permalink }}">
+        <h2 itemprop="name">{{ .Title }}</h2>
+      </a>
+      <div class="metadata row">
+        {{ partial "events/metadata.html" . }}
+      </div>
+    </header>
+    <div class="post-list-summary" itemprop="description">
+      <p>
+        {{- $page := . -}}
+        {{- with .Description -}}
+          {{ . | plainify | htmlUnescape | replaceRE "(?m)(\\s+)" " " }} <a href="{{ $page.Permalink }}">[Read more...]</a>
+        {{- else -}}
+          {{ .Summary | plainify | htmlUnescape | replaceRE "(?m)(\\s+)" " " }}{{ if .Truncated }} <a href="{{ $page.Permalink }}">[Read more...]</a>{{ end }}
+        {{- end -}}
+      </p>
+    </div>
+  </div>
+</article>
