@@ -13,10 +13,9 @@ copyright = "Copyright (c) 2017, all rights reserved."
 SectionPagesMenu = "main"
 
 # use Chroma for syntax highlight
-pygmentsStyle = "native" # other dark style options: vim, fruity, monokai
+PygmentsStyle = "native" # other dark style options: vim, fruity, monokai
 # enable syntax highlight for code blocks
-pygmentsCodeFences = false
-pygmentsUseClassic = true
+PygmentsCodeFences = true
 
 [[menu.main]]
   name = "Posts"
