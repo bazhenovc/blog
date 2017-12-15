@@ -34,11 +34,11 @@ pygmentsCodeFences = true
   description = "Personal blog."
 
 [params]
-  github = "github id"
-  gitlab = "gitlab id"
-  twitter = "twitter id"
-  linkedin = "linkedin id"
-  email = "myemail"
+  github = "bazhenovc"
+  #gitlab = "gitlab id"
+  #twitter = "twitter id"
+  #linkedin = "linkedin id"
+  email = "bazhenovc@gmail.com"
 
 [params.colors]
   # hugo-dusk colors
