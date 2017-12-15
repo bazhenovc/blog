@@ -18,7 +18,7 @@ SectionPagesMenu = "main" # Enable menu system for lazy bloggers
     post_navigation = false                         # Enable custom or in-section "Next/Previous" links
     # See the documentation on commenting for how to set up HashOver or Muut commenting
     # https://shadow53.gitlab.io/BluestNight/docs/pages/comments/
-    #hashover = true                               # Enable HashOver comments
+    hashover = false                               # Enable HashOver comments
     #muut = "muut-community-name"                  # Enabled Muut comments by providing the name of your Muut community
 
 # Uncomment this section to use a background image on your site
