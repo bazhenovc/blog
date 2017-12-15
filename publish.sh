@@ -21,7 +21,7 @@ echo "Removing existing files"
 rm -rf public/*
 
 echo "Generating site"
-D:/tmp/hugo/hugo.exe --theme=hugo_theme_beg
+D:/tmp/hugo/hugo.exe --theme=BluestNight
 
 echo "Updating gh-pages branch"
 cd public && git add --all && git commit -m "Publishing to gh-pages (publish.sh)"
