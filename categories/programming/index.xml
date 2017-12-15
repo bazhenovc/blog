@@ -17,7 +17,7 @@
       <pubDate>Fri, 15 Dec 2017 17:54:23 +0300</pubDate>
       
       <guid>https://bazhenovc.github.io/blog/post/unordered-map-pitfall/</guid>
-      <description>&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;
+      <description>&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>

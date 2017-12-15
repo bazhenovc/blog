@@ -16,21 +16,21 @@
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
     <title>Unordered Map Pitfall - bazhenovc</title>
     
-<meta name="description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta name="description" content="&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 
 <meta property="og:title" content="Unordered Map Pitfall - bazhenovc">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
 <meta property="og:image" content="https://bazhenovc.github.io/blog/images/default.png">
 <meta property="og:site_name" content="bazhenovc">
-<meta property="og:description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta property="og:description" content="&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 <meta property="og:locale" content="ja_JP">
 
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="bazhenovc">
 <meta name="twitter:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
 <meta name="twitter:title" content="Unordered Map Pitfall - bazhenovc">
-<meta name="twitter:description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta name="twitter:description" content="&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
 <meta name="twitter:image" content="https://bazhenovc.github.io/blog/images/default.png">
 
 
@@ -65,7 +65,7 @@
         "height": 60
       }
     },
-    "description": "<p>std::unordered_map implementation in MSVC has a major performance issue.</p>
+    "description": "<p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
 
 <p></p>"
   }
@@ -128,7 +128,7 @@
 
   
 
-  <div class="article-body"><p>std::unordered_map implementation in MSVC has a major performance issue.</p>
+  <div class="article-body"><p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
 
 <p></p>
 
@@ -136,7 +136,7 @@
 
 <p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
 
-<p><code>unordered_map</code>:</p>
+<p><code>&lt;unordered_map&gt;</code>:</p>
 
 <pre><code>        // TEMPLATE CLASS unordered_map
 template&lt;class _Kty,
@@ -160,7 +160,7 @@ template&lt;class _Kty,
 
 <p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
 
-<p><code>unordered_map</code>:</p>
+<p><code>&lt;unordered_map&gt;</code>:</p>
 
 <pre><code>template&lt;class... _Valty&gt;
     iterator emplace(_Valty&amp;&amp;... _Val)
@@ -171,7 +171,7 @@ template&lt;class _Kty,
 
 <p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
 
-<p><code>xhash</code>:</p>
+<p><code>&lt;xhash&gt;</code>:</p>
 
 <pre><code>        // TEMPLATE CLASS _Hash
 template&lt;class _Traits&gt;
@@ -190,13 +190,15 @@ template&lt;class _Traits&gt;
 
 <p>Oh wait, what&rsquo;s that?</p>
 
+<p><code>&lt;xhash&gt;</code>:</p>
+
 <pre><code>typedef std::list&lt;...&gt; _Mylist;
 _Mylist _List;  // list of elements, must initialize before _Vec
 </code></pre>
 
 <p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
 
-<p><code>list</code>:</p>
+<p><code>&lt;list&gt;</code>:</p>
 
 <pre><code>    template&lt;class... _Valty&gt;
         void emplace_front(_Valty&amp;&amp;... _Val)
@@ -225,7 +227,7 @@ _Mylist _List;  // list of elements, must initialize before _Vec
     _Nodeptr _Buynode0(_Nodeptr _Next,
     _Nodeptr _Prev)
         {   // allocate a node and set links
-        _Nodeptr _Pnode = _Getal().allocate(1);
+        _Nodeptr _Pnode = _Getal().allocate(1);                 // Whoa hello there!
         // Irrelevant code omitted
         }
 </code></pre>
