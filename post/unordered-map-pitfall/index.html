@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unordered Map Pitfall</title>
+
+    
+    
+    
+    <link rel="preload" href="https://bazhenovc.github.io/blog/styles.css" as="style" />
+
+    <link rel="dns-prefetch" href="https://maxcdn.bootstrapcdn.com/" />
+    <link rel="preconnect" href="https://maxcdn.bootstrapcdn.com/" />
+    <link rel="preload" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" as="style">
+
+    <meta name="description" itemprop="description" content="&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;  &lt;p&gt;&lt;/p&gt;" id="desc"><meta name="generator" content="Hugo 0.31.1" /><meta name="keywords" itemprop="keywords" content="C&#43;&#43;" id="keywords"><link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+
+    
+  <link rel="stylesheet" type="text/css" href="https://bazhenovc.github.io/blog/css/dark.css"><link rel="stylesheet" type="text/css" href="https://bazhenovc.github.io/blog/styles.css">
+
+    <script>var _paq = undefined;</script></head>
+  <body itemscope itemtype="http://schema.org/WebPage">
+    <div id="site-container">
+      <div id="site-header">
+        <header class="small-text-center medium-text-left row">
+          <a class="row-item" href="https://bazhenovc.github.io/blog/">
+            <span id="site-title" itemprop="name">bazhenovc</span>
+            
+          </a>
+        </header>
+        </div>
+      <div id="main-container" class="row" role="main" itemprop="mainContentOfPage">
+        
+        
+        
+<main class="row-item small-full medium-two-thirds" >
+  <article id="post-article" itemscope itemtype="http://schema.org/Article" itemref="keywords desc">
+    <header id="page-header">
+      <h1 itemprop="headline">Unordered Map Pitfall</h1><p id="post-metadata" class="row"><span class="row-item">
+          <span class="fa fa-clock-o"></span>
+          <strong>Published:</strong>
+          <time datetime="2017-12-15" content="2017-12-15" itemprop="datePublished">December 15, 2017</time>
+        </span><span class="row-item">
+          <span class="fa fa-folder"></span>
+          <a href="https://bazhenovc.github.io/blog/categories/programming" rel="category">Programming</a>, <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;" rel="category">C&#43;&#43;</a>
+        </span><span class="row-item"><span class="fa fa-book"></span> <strong>Estimated reading time:</strong> ~<span itemprop="timeRequired">2 minutes</span></span></p>
+      
+    </header>
+    
+    <div id="post-content">
+      <span itemprop="articleBody"><p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
+
+<p></p>
+
+<h1 id="a-story-of-unordered-map-performance">A story of unordered_map performance</h1>
+
+<p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS unordered_map
+template&lt;class _Kty,
+    class _Ty,
+    class _Hasher = hash&lt;_Kty&gt;,
+    class _Keyeq = equal_to&lt;_Kty&gt;,
+    class _Alloc = allocator&lt;pair&lt;const _Kty, _Ty&gt; &gt; &gt;
+    class unordered_map
+        : public _Hash&lt;_Umap_traits&lt;_Kty, _Ty,
+            _Uhash_compare&lt;_Kty, _Hasher, _Keyeq&gt;, _Alloc, false&gt; &gt;
+    {   // hash table of {key, mapped} values, unique keys
+    //
+    // Irrelevant code omitted
+    //
+    template&lt; ... &gt;
+        _Pairib insert(_Valty&amp;&amp; _Val)
+        {   // insert _Val
+        return (this-&gt;emplace(_STD forward&lt;_Valty&gt;(_Val)));
+        }
+</code></pre>
+
+<p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<pre><code>template&lt;class... _Valty&gt;
+    iterator emplace(_Valty&amp;&amp;... _Val)
+    {   // try to insert value_type(_Val...), favoring right side
+    return (_Mybase::emplace(_STD forward&lt;_Valty&gt;(_Val)...).first);
+    }
+</code></pre>
+
+<p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>        // TEMPLATE CLASS _Hash
+template&lt;class _Traits&gt;
+    class _Hash
+    {   // hash table -- list with vector of iterators for quick access
+    //
+    // Irrelevant code omitted
+    //
+    template&lt;class... _Valty&gt;
+        _Pairib emplace(_Valty&amp;&amp;... _Val)
+        {   // try to insert value_type(_Val...)
+        _List.emplace_front(_STD forward&lt;_Valty&gt;(_Val)...);
+        return (_Insert(_List.front(), _Unchecked_begin()));
+        }
+</code></pre>
+
+<p>Oh wait, what&rsquo;s that?</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<pre><code>typedef std::list&lt;...&gt; _Mylist;
+_Mylist _List;  // list of elements, must initialize before _Vec
+</code></pre>
+
+<p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
+
+<p><code>&lt;list&gt;</code>:</p>
+
+<pre><code>    template&lt;class... _Valty&gt;
+        void emplace_front(_Valty&amp;&amp;... _Val)
+        {   // insert element at beginning
+        _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)...);
+        }
+    template&lt;class... _Valty&gt;
+        void _Insert(_Unchecked_const_iterator _Where,
+        _Valty&amp;&amp;... _Val)
+        {   // insert element at _Where
+        _Nodeptr _Pnode = _Where._Mynode();
+        _Nodeptr _Newnode =
+            this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode), // We're interested in this one
+                _STD forward&lt;_Valty&gt;(_Val)...);
+        // Irrelevant code omitted
+        }
+    // _Buynode
+    template&lt;class... _Valty&gt;
+    _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+        _Valty&amp;&amp;... _Val)
+        {   // allocate a node and set links and value
+        _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev); // It calls _Buynode0
+        // Irrelevant code omitted
+        }
+    // _Buynode0
+    _Nodeptr _Buynode0(_Nodeptr _Next,
+    _Nodeptr _Prev)
+        {   // allocate a node and set links
+        _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
+        // Irrelevant code omitted
+        }
+</code></pre>
+
+<p>Here we go. <code>_Buynode0</code> ALWAYS makes a small memory allocation for 1 element, thus in MSVC <code>std::list</code> ALWAYS allocates memory every single time something is inserted into it, thus <code>std::unordered_map</code> ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
+
+<p>Thanks for reading!</p></span>
+    </div><div id="post-tags">
+    	<ul class="menu">
+        <li class="row-item"><i class="fa fa-tags"></i>&nbsp;&nbsp;</li><li itemprop="relatedUrl" itemscope itemtype="http://schema.org/URL"><a class="row-item button" href="https://bazhenovc.github.io/tags/c&#43;&#43;" rel="tag" itemprop="url">c&#43;&#43;</a>
+    		</li></ul>
+    </div></article>
+
+  </main>
+
+        <aside class="row-item small-full medium-third right" itemscope itemtype="http://schema.org/WPSideBar">
+  
+  
+  
+	
+  
+	
+	
+</aside>
+
+      </div>
+      <footer class="row">
+        <div class="small-full medium-half small-text-center medium-text-left medium-left row">
+          <div class="small-full">
+            <small>
+              &copy; 2017
+              <span itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+                <span itemprop="name">bazhenovc</span>
+              </span>
+            </small>
+          </div>
+          <div class="small-full row">
+            
+            
+            
+          </div>
+        </div>
+        
+        <div id="social-icons" class="row small-full medium-half small-text-center medium-text-right" style="align-self: center;">
+
+
+</div>
+      </footer>
+    </div>
+    </body>
+</html>
