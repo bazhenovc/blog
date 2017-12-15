@@ -1,72 +1,67 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GPU Driven Occlusion Culling in Life is Feudal</title>
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+<meta charset="utf-8">
+<meta name="description" content="">
+<meta name="keywords" content="">
+<meta name="author" content="">
+<meta name="generator" content="Hugo 0.31.1" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://bazhenovc.github.io/css/style.css" type="text/css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700" type="text/css">
+<link rel="alternate" href="https://bazhenovc.github.io/index.xml" type="application/rss+xml" title="bazhenovc">
+<title>GPU Driven Occlusion Culling in Life is Feudal - bazhenovc</title>
+</head>
+<body>
 
-    
-    
-    
-    <link rel="preload" href="https://bazhenovc.github.io/blog/styles.css" as="style" />
-
-    <link rel="dns-prefetch" href="https://maxcdn.bootstrapcdn.com/" />
-    <link rel="preconnect" href="https://maxcdn.bootstrapcdn.com/" />
-    <link rel="preload" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" as="style">
-
-    <meta name="description" itemprop="description" content="&lt;p&gt;In 2016 I gave a small talk in Dublin, Ireland about the subj, here are &lt;a href=&#34;https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/&#34;&gt;the slides&lt;/a&gt; and below you can find a more or less human-readable version of the slides above.&lt;/p&gt;  &lt;p&gt;&lt;/p&gt;" id="desc"><meta name="generator" content="Hugo 0.31.1" /><meta name="keywords" itemprop="keywords" content="Direct3D,Direct3D 11,OpenGL" id="keywords"><link rel="canonical" href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/">
-
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
-
-    
-  <link rel="stylesheet" type="text/css" href="https://bazhenovc.github.io/blog/css/dark.css"><link rel="stylesheet" type="text/css" href="https://bazhenovc.github.io/blog/styles.css">
-
-    <link rel="preload" href="/blog/oc_reprojection_holes.png" as="image" />
-    <link rel="preload" href="/blog/oc_reprojection_holes_fix.png" as="image" />
-    <link rel="preload" href="/blog/gpu_oc.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest_bounds.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest_window.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest_window_bounds.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest_window_rendered.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_forest_window_rendered_off.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_diagram.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_bounds.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_mess.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_boxmerge_diagram.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_boxmerge_result.png" as="image" />
-    <link rel="preload" href="/blog/lif_oc_drawindirect_bug.png" as="image" />
-    <script>var _paq = undefined;</script></head>
-  <body itemscope itemtype="http://schema.org/WebPage">
-    <div id="site-container">
-      <div id="site-header">
-        <header class="small-text-center medium-text-left row">
-          <a class="row-item" href="https://bazhenovc.github.io/blog/">
-            <span id="site-title" itemprop="name">bazhenovc</span>
-            
-          </a>
-        </header>
-        </div>
-      <div id="main-container" class="row" role="main" itemprop="mainContentOfPage">
-        
-        
-        
-<main class="row-item small-full medium-two-thirds" >
-  <article id="post-article" itemscope itemtype="http://schema.org/Article" itemref="keywords desc">
-    <header id="page-header">
-      <h1 itemprop="headline">GPU Driven Occlusion Culling in Life is Feudal</h1><p id="post-metadata" class="row"><span class="row-item">
-          <span class="fa fa-clock-o"></span>
-          <strong>Published:</strong>
-          <time datetime="2017-02-02" content="2017-02-02" itemprop="datePublished">February 02, 2017</time>
-        </span><span class="row-item">
-          <span class="fa fa-folder"></span>
-          <a href="https://bazhenovc.github.io/blog/categories/programming" rel="category">Programming</a>, <a href="https://bazhenovc.github.io/blog/categories/graphics" rel="category">Graphics</a>
-        </span><span class="row-item"><span class="fa fa-book"></span> <strong>Estimated reading time:</strong> ~<span itemprop="timeRequired">8 minutes</span></span></p>
+<header>
+  <div class="container clearfix">
+    <a class="path" href="https://bazhenovc.github.io/blog/">[bazhenovc]</a>
+    <span class="caret"># _</span>
+    <div class="right">
       
-    </header>
-    
-    <div id="post-content">
-      <span itemprop="articleBody"><p>In 2016 I gave a small talk in Dublin, Ireland about the subj, here are <a href="https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/">the slides</a> and below you can find a more or less human-readable version of the slides above.</p>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+
+
+<main role="main" class="article">
+  
+<article class="single" itemscope itemtype="http://schema.org/BlogPosting">
+  <div class="meta">
+
+    <span class="key">published on</span>
+    <span class="val"><time itemprop="datePublished" datetime="2017-02-02">February 02, 2017</time></span>
+
+
+    <span class="key">in</span>
+    <span class="val">
+
+        <a href="https://bazhenovc.github.io/blog/categories/programming">Programming</a>
+
+        <a href="https://bazhenovc.github.io/blog/categories/graphics">Graphics</a>
+
+    </span>
+
+
+    <br>
+    <span class="key">tags:</span>
+    <span class="val">
+
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d">Direct3D</a>
+
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d-11">Direct3D 11</a>
+
+        <a href="https://bazhenovc.github.io/blog/tags/opengl">OpenGL</a>
+
+    </span>
+
+  </div>
+  <h1 class="headline" itemprop="headline">GPU Driven Occlusion Culling in Life is Feudal</h1>
+  <section class="body" itemprop="articleBody">
+    <p>In 2016 I gave a small talk in Dublin, Ireland about the subj, here are <a href="https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/">the slides</a> and below you can find a more or less human-readable version of the slides above.</p>
 
 <p></p>
 
@@ -468,50 +463,21 @@
 
 <p>Here&rsquo;s a nice DrawIndirect-related driver bug that I&rsquo;ve found worth sharing:</p>
 
-<p><img src="/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p></span>
-    </div><div id="post-tags">
-    	<ul class="menu">
-        <li class="row-item"><i class="fa fa-tags"></i>&nbsp;&nbsp;</li><li itemprop="relatedUrl" itemscope itemtype="http://schema.org/URL"><a class="row-item button" href="https://bazhenovc.github.io/tags/direct3d" rel="tag" itemprop="url">direct3 d</a>
-    		</li><li itemprop="relatedUrl" itemscope itemtype="http://schema.org/URL"><a class="row-item button" href="https://bazhenovc.github.io/tags/direct3d-11" rel="tag" itemprop="url">direct3 d 11</a>
-    		</li><li itemprop="relatedUrl" itemscope itemtype="http://schema.org/URL"><a class="row-item button" href="https://bazhenovc.github.io/tags/opengl" rel="tag" itemprop="url">open g l</a>
-    		</li></ul>
-    </div></article>
+<p><img src="/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p>
+  </section>
+</article>
 
-  </main>
-
-        <aside class="row-item small-full medium-third right" itemscope itemtype="http://schema.org/WPSideBar">
-  
-  
-  
-	
-  
-	
-	
-</aside>
-
-      </div>
-      <footer class="row">
-        <div class="small-full medium-half small-text-center medium-text-left medium-left row">
-          <div class="small-full">
-            <small>
-              &copy; 2017
-              <span itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-                <span itemprop="name">bazhenovc</span>
-              </span>
-            </small>
-          </div>
-          <div class="small-full row">
-            
-            
-            
-          </div>
-        </div>
-        
-        <div id="social-icons" class="row small-full medium-half small-text-center medium-text-right" style="align-self: center;">
+</main>
 
 
 </div>
-      </footer>
-    </div>
-    </body>
+
+<footer>
+  <div class="container">
+    <span class="copyright">&copy; 2017  bazhenovc - <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a></span>
+  </div>
+</footer>
+
+</body>
 </html>
+

@@ -7,7 +7,8 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 15 Dec 2017 17:54:23 +0300</lastBuildDate>
-    <atom:link href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://bazhenovc.github.io/blog/tags/c++/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -20,33 +21,6 @@
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
-    
-    
-    
-    <item>
-      <title>GPU Driven Occlusion Culling in Life is Feudal</title>
-      <link>https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/</link>
-      <pubDate>Thu, 02 Feb 2017 03:26:00 +0300</pubDate>
-      
-      <guid>https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/</guid>
-      <description>&lt;p&gt;In 2016 I gave a small talk in Dublin, Ireland about the subj, here are &lt;a href=&#34;https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/&#34;&gt;the slides&lt;/a&gt; and below you can find a more or less human-readable version of the slides above.&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
-    
-    
-    
-    <item>
-      <title>Dynamic vertex pulling with D3D11</title>
-      <link>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</link>
-      <pubDate>Thu, 02 Feb 2017 02:33:31 +0300</pubDate>
-      
-      <guid>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</guid>
-      <description>&lt;p&gt;This is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;/p&gt;</description>
-    </item>
-    
     
   </channel>
 </rss>

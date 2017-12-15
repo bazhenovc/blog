@@ -7,7 +7,8 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <lastBuildDate>Fri, 15 Dec 2017 17:54:23 +0300</lastBuildDate>
-    <atom:link href="https://bazhenovc.github.io/blog/" rel="self" type="application/rss+xml" />
+    
+	<atom:link href="https://bazhenovc.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
@@ -21,8 +22,6 @@
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
     
-    
-    
     <item>
       <title>GPU Driven Occlusion Culling in Life is Feudal</title>
       <link>https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/</link>
@@ -34,8 +33,6 @@
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
     
-    
-    
     <item>
       <title>Dynamic vertex pulling with D3D11</title>
       <link>https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/</link>
@@ -46,7 +43,6 @@
 
 &lt;p&gt;&lt;/p&gt;</description>
     </item>
-    
     
   </channel>
 </rss>
