@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">
+
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
+    <title>Dynamic vertex pulling with D3D11 - bazhenovc</title>
+    
+<meta name="description" content="&lt;p&gt;This is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+
+<meta property="og:title" content="Dynamic vertex pulling with D3D11 - bazhenovc">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">
+<meta property="og:image" content="https://bazhenovc.github.io/blog/images/default.png">
+<meta property="og:site_name" content="bazhenovc">
+<meta property="og:description" content="&lt;p&gt;This is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="bazhenovc">
+<meta name="twitter:url" content="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/">
+<meta name="twitter:title" content="Dynamic vertex pulling with D3D11 - bazhenovc">
+<meta name="twitter:description" content="&lt;p&gt;This is crossposted from &lt;a href=&#34;http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048&#34;&gt;GameDev.net&lt;/a&gt;&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta name="twitter:image" content="https://bazhenovc.github.io/blog/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https://bazhenovc.github.io/blog/"
+    },
+    "headline": "Dynamic vertex pulling with D3D11 - bazhenovc",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://bazhenovc.github.io/blog/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2017-02-02T02:33:31JST",
+    "dateModified": "2017-02-02T02:33:31JST",
+    "author": {
+      "@type": "Person",
+      "name": "bazhenovc"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "bazhenovc",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://bazhenovc.github.io/blog/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "<p>This is crossposted from <a href="http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048">GameDev.net</a></p>
+
+<p></p>"
+  }
+</script>
+
+
+    <link href="https://bazhenovc.github.io/blog/css/styles.css" rel="stylesheet">
+  </head>
+
+  <body>
+    
+    
+    
+
+    <header class="l-header">
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+          </div>
+
+          
+
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="container">
+        
+<div class="row">
+  <div class="col-md-8">
+
+    <nav class="p-crumb">
+      <ol class="breadcrumb">
+        <li><a href="https://bazhenovc.github.io/blog/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://bazhenovc.github.io/blog/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li class="active">Dynamic vertex pulling with D3D11</li>
+      </ol>
+    </nav>
+
+    <article class="single">
+  <header>
+    <ul class="p-facts">
+      <li><i class="fa fa-calendar" aria-hidden="true"></i><time datetime="2017-02-02T02:33:31JST">Feb 2, 2017</time></li>
+      <li><i class="fa fa-bookmark" aria-hidden="true"></i><a href="https://bazhenovc.github.io/blog/post/">post</a></li>
+      
+    </ul>
+
+    <h1 class="title">Dynamic vertex pulling with D3D11</h1>
+  </header>
+
+  
+
+  <div class="article-body"><p>This is crossposted from <a href="http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/dynamic-vertex-pulling-with-d3d11-r4048">GameDev.net</a></p>
+
+<p></p>
+
+<h1 id="motivation">Motivation</h1>
+
+<p>The motivation is very simple: regular hardware instancing is suddenly not enough for the current project. The reason for this is the amount of different trees, for which the simple arithmetic works:</p>
+
+<ol>
+<li>9 base types of trees</li>
+<li>3 growth stages for each tree (a branch, a small tree and a big tree)</li>
+<li>3 health stages for each growth stage for each tree (healthy, sick and dying)</li>
+<li>5 LODs for each health stage for each growth stage for each tree (including impostors)</li>
+<li>This creates a serious combinatorial explosion, which makes regular instancing a lot less effective.</li>
+</ol>
+
+<p>Below I suggest a solution that allows one to bypass this problem and to render all these different trees with a single draw call, while having a unique mesh and unique constants per each object.</p>
+
+<h1 id="main-idea">Main idea</h1>
+
+<p>D3D11 and GL4 support [RW]StructuredBuffer (D3D) and ARB_shader_storage_buffer_object (GL), which represent some GPU memory buffer with structured data. A shader can fetch the data from this buffer by an arbitrary index.</p>
+
+<p>I suggest to use 2 global buffers to store vertices and indices and to fetch the data from there in a vertex shader using a vertex ID.</p>
+
+<p>This way we can supply an offset to this buffer as a regular constant and start fetching vertices starting from this offset.</p>
+
+<p>How do we implement this?</p>
+
+<h1 id="logical-and-physical-buffers">Logical and physical buffers</h1>
+
+<p>Let us introduce two terms: a physical buffer and a logical buffer.</p>
+
+<p>A physical buffer is a GPU memory buffer which stores all indices and vertices of our geometry. Essentially it is a sort of a &ldquo;geometry atlas&rdquo; - we pack all our mesh data there.</p>
+
+<p>A logical buffer is a data structure that contains physical buffer offset and a data block size.</p>
+
+<p>In C++ this will look like this:</p>
+
+<pre><code>struct DXLogicalMeshBuffer final
+{
+    uint8_t* data             = nullptr;
+    size_t   dataSize         = 0;
+    size_t   dataFormatStride = 0;
+    size_t   physicalAddress  = 0;
+};
+</code></pre>
+
+<p>The struct fields are used for:</p>
+
+<ul>
+<li>data : a pointer to the buffer data</li>
+<li>dataSize : Buffer data size in bytes</li>
+<li>dataFormatStride : One buffer element size</li>
+<li>physicalAddress : Physical buffer offset, by which this buffer data is located. This field is set when physical buffer is updated (see below)</li>
+</ul>
+
+<p>Upon logical buffer creation a physical buffer must know about the logical buffer to create a storage space for it.</p>
+
+<p>Physical buffer class looks like this:</p>
+
+<pre><code>struct DXPhysicalMeshBuffer final
+{
+    ID3D11Buffer*             physicalBuffer     = nullptr;
+    ID3D11ShaderResourceView* physicalBufferView = nullptr;
+    size_t                    physicalDataSize   = 0;
+    bool                      isDirty            = false;
+
+    typedef DynamicArray&lt;DXLogicalMeshBuffer*&gt; PageArray;
+    PageArray allPages;
+
+    DXPhysicalMeshBuffer() = default;
+    inline ~DXPhysicalMeshBuffer()
+    {
+        if (physicalBuffer != nullptr)     physicalBuffer-&gt;Release();
+        if (physicalBufferView != nullptr) physicalBufferView-&gt;Release();
+    }
+
+    void allocate(DXLogicalMeshBuffer* logicalBuffer);
+    void release(DXLogicalMeshBuffer* logicalBuffer);
+    void rebuildPages(); // very expensive operation
+}
+</code></pre>
+
+<p>The class fields are used for:</p>
+
+<ul>
+<li>physicalBuffer : An actual buffer with the data</li>
+<li>physicalBufferView : A shader resource view for shader data access</li>
+<li>physicalDataSize : Buffer data size in bytes</li>
+<li>isDirty : A flag that indicates the need for buffer update (it is needed after each logical buffer allocation/deallocation).</li>
+<li>allPages : All logical buffers allocated inside this physical buffer.</li>
+</ul>
+
+<p>Each time a logical buffer is allocated/freed a physical buffer needs to be informed about this. Allocate/release operations are quite trivial:</p>
+
+<pre><code>void DXPhysicalBuffer::allocate(DXLogicalMeshBuffer* logicalBuffer)
+{
+    allPages.Add(logicalBuffer);
+    isDirty = true;
+}
+
+void DXPhysicalBuffer::release(DXLogicalMeshBuffer* logicalBuffer)
+{
+    allPages.Remove(logicalBuffer);
+    isDirty = true;
+}
+</code></pre>
+
+<p>rebuildPages() method is much more interesting.</p>
+
+<p>This method must create a physical buffer and fill it with the data from all used logical buffers. A physical buffer must be mappable to RAM and bindable as a structured shader resource.</p>
+
+<pre><code>size_t vfStride = allPages[0]-&gt;dataFormatStride; // TODO: right now will not work with different strides
+size_t numElements = physicalDataSize / vfStride;
+
+if (physicalBuffer != nullptr)     physicalBuffer-&gt;Release();
+if (physicalBufferView != nullptr) physicalBufferView-&gt;Release();
+
+D3D11_BUFFER_DESC bufferDesc;
+bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           = physicalDataSize;
+bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride = vfStride;
+bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+
+if (FAILED(g_pd3dDevice-&gt;CreateBuffer(&amp;bufferDesc, nullptr, &amp;physicalBuffer))) {
+    handleError(...); // handle your error here
+    return;
+}
+</code></pre>
+
+<p>Make sure that StructureByteStride is equal to the size of a structure read by the vertex shader. Also, CPU write access is required.</p>
+
+<p>After that we need to create a shader resource view:</p>
+
+<pre><code>D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+std::memset(&amp;viewDesc, 0, sizeof(viewDesc));
+
+viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth = numElements;
+
+if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(physicalBuffer, &amp;viewDesc, &amp;physicalBufferView)))
+{
+    // TODO: error handling
+    return;
+}
+</code></pre>
+
+<p>Whew. Now let us get straight to the physical buffer filling! The algorithm is:</p>
+
+<ol>
+<li>Map the physical buffer to RAM.</li>
+<li>for each logical buffer:</li>
+<li>Calculate logical buffer offset into the physical buffer (physicalAddress field).</li>
+<li>Copy the data from the logical buffer to the mapped memory with the needed offset.</li>
+<li>Go to the next logical buffer.</li>
+<li>Unmap the physical buffer.</li>
+</ol>
+
+<p>The code is quite simple:</p>
+
+<pre><code>// fill the physical buffer
+D3D11_MAPPED_SUBRESOURCE mappedData;
+std::memset(&amp;mappedData, 0, sizeof(mappedData));
+
+if (FAILED(g_pImmediateContext-&gt;Map(physicalBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &amp;mappedData)))
+{
+    handleError(...); // insert error handling here
+    return;
+}
+
+uint8_t* dataPtr = reinterpret_cast&lt;uint8_t*&gt;(mappedData.pData);
+size_t pageOffset = 0;
+for (size_t i = 0; i &lt; allPages.GetSize(); ++i) {
+    DXLogicalMeshBuffer* logicalBuffer = allPages[i];
+    // copy logical data to the mapped physical data
+    std::memcpy(dataPtr + pageOffset, logicalBuffer-&gt;data, logicalBuffer-&gt;dataSize);
+    // calculate physical address
+    logicalBuffer-&gt;physicalAddress = pageOffset / logicalBuffer-&gt;dataFormatStride;
+    // calculate offset
+    pageOffset += logicalBuffer-&gt;dataSize;
+}
+
+g_pImmediateContext-&gt;Unmap(physicalBuffer, 0);
+</code></pre>
+
+<p>Note that rebuilding a physical buffer is a very expensive operation, in our case it is around 500ms. This slowness is caused by the high amount of data that is being sent to the GPU (tens of megabytes!). This why it is not recommended to rebuild the physical buffer often.</p>
+
+<p><a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc#L127">Full code for rebuildPages() method for reference.</a></p>
+
+<p>Storing and rendering stuff like that requires a custom constant managing as well.</p>
+
+<h1 id="managing-per-object-constants">Managing per-object constants</h1>
+
+<p>Traditional constant buffers does not fit here for obvious reasons. That&rsquo;s why there is no other choice then to use one more global buffer, similar to the physical buffer described above.</p>
+
+<p>Apart from usual shader constants this buffer must contain logical buffer information, geometry type (indexed and non-indexed) and vertex count.</p>
+
+<p>Creating this buffer is trivial:</p>
+
+<pre><code>std::memset(&amp;bufferDesc, 0, sizeof(bufferDesc));
+
+bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           = dataBufferSize;
+bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride = stride;
+bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+
+if (FAILED(g_pd3dDevice-&gt;CreateBuffer(&amp;bufferDesc, nullptr, &amp;dataBuffer))) {
+    handleError(...); // handle your error here
+    return;
+}
+
+D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+std::memset(&amp;viewDesc, 0, sizeof(viewDesc));
+
+viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth = numInstances;
+
+if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(dataBuffer, &amp;viewDesc, &amp;dataView))) {
+    handleError(...); // handle your error here
+    return;
+}
+</code></pre>
+
+<p>First, four 32-bit registers of this buffer are filled with a shader internal data used for rendering. This data looks like this:</p>
+
+<pre><code>struct InternalData
+{
+    uint32_t vb;
+    uint32_t ib;
+    uint32_t drawCallType;
+    uint32_t count;
+};
+</code></pre>
+
+<p>After this structure goes the usual constant data used for generic mesh rendering (such as projection matrix).</p>
+
+<p>Now a small digression. I usually don&rsquo;t render anything directly, instead I use an array of DrawCall structures, which also contain constants and all other data needed for a single DIP:</p>
+
+<pre><code>struct DrawCall final
+{
+    enum Type : uint32_t
+    {
+        Draw        = 0,
+        DrawIndexed = 1
+    };
+
+    enum
+    {
+        ConstantBufferSize = 2048 // TODO: remove hardcode
+    };
+
+    enum
+    {
+        MaxTextures = 8
+    };
+
+    uint8_t constantBufferData[ConstantBufferSize];
+
+    DXLogicalMeshBuffer* vertexBuffer;
+    DXLogicalMeshBuffer* indexBuffer;
+
+    uint32_t count;
+    uint32_t startVertex;
+    uint32_t startIndex;
+    Type     type;
+};
+</code></pre>
+
+<p>This is simplified to make reading easier.</p>
+
+<p>The application fills an array of these structures and submits them for rendering.</p>
+
+<p>After filling this draw call buffer we need to update the constant buffer, update InternalData and, finally, issue a real DIP to render stuff.</p>
+
+<p>Updating constants is trivial, just loop through the command buffer and copy needed data to the right place:</p>
+
+<pre><code>// update constants
+{
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+    if (FAILED(g_pImmediateContext-&gt;Map(psimpl-&gt;constantBuffer.dataBuffer, 0, D3D11_MAP_WRITE_DISCARD,
+      0, &amp;mappedData))) {
+        // TODO: error handling
+        return;
+    }
+    uint8_t* dataPtr = reinterpret_cast&lt;uint8_t*&gt;(mappedData.pData);
+    for (size_t i = 0; i &lt; numInstances; ++i) {
+        size_t offset = i * internal::DrawCall::ConstantBufferSize;
+        const internal::DrawCall&amp; call = queue-&gt;getDrawCalls()[i];
+
+        std::memcpy(dataPtr + offset, call.constantBufferData, internal::DrawCall::ConstantBufferSize);
+
+        // fill internal data structure
+        InternalData* idata = reinterpret_cast&lt;InternalData*&gt;(dataPtr + offset);
+
+        DXLogicalMeshBuffer* vertexBuffer = static_cast&lt;DXLogicalMeshBuffer*&gt;(call.vertexBuffer.value);
+        if (vertexBuffer != nullptr)
+            idata-&gt;vb = vertexBuffer-&gt;physicalAddress;
+
+        DXLogicalMeshBuffer* indexBuffer = static_cast&lt;DXLogicalMeshBuffer*&gt;(call.indexBuffer.value);
+        if (indexBuffer != nullptr)
+            idata-&gt;ib = indexBuffer-&gt;physicalAddress;
+
+        idata-&gt;drawCallType = call.type;
+        idata-&gt;count        = call.count;
+    }
+    g_pImmediateContext-&gt;Unmap(psimpl-&gt;constantBuffer.dataBuffer, 0);
+}
+</code></pre>
+
+<p>The data is now ready for actual rendering.</p>
+
+<h1 id="shader-and-drawing">Shader and drawing</h1>
+
+<p>Time for drawing! To render everything we need to set the buffers and issue DrawInstanced:</p>
+
+<pre><code>ID3D11ShaderResourceView* vbibViews[2] = {
+    g_physicalVertexBuffer-&gt;physicalBufferView,
+    g_physicalIndexBuffer-&gt;physicalBufferView
+};
+
+g_pImmediateContext-&gt;VSSetShaderResources(0, 2, vbibViews);
+
+g_pImmediateContext-&gt;VSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+g_pImmediateContext-&gt;HSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+g_pImmediateContext-&gt;DSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+g_pImmediateContext-&gt;GSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+g_pImmediateContext-&gt;PSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+
+g_pImmediateContext-&gt;DrawInstanced(maxDrawCallVertexCount, numInstances, 0, 0);
+</code></pre>
+
+<p>Almost done. A few notes:</p>
+
+<ul>
+<li>DrawInstanced needs to be called with a maximum amount of vertices the command buffer has. This is required because we have a single draw call and several meshes. Meshes can have different amount of vertices/indices and this needs to be taken into account. I suggest to render the maximum amount of vertices and discard redundant vertices by sending them outside the clip plane.</li>
+<li>This introduces some additional vertex shader overhead, thus you need to carefully watch for the difference between maximum and minimum vertices being within a reasonable range (typically 10% difference is OK). Remember that these wasted vertices add overhead to each rendered instance and it grows insanely fast. Watch for the artists!</li>
+<li>One DrawInstanced call can handle both indexed and non-indexed geometry, because this is handled in the vertex shader. TriangleStrip, TriangleFan and similar topologies are not supported for obvious reasons. This method supports only *List topologies (TriangleList, PointList, etc.)</li>
+</ul>
+
+<p>The vertex shader is also very simple.</p>
+
+<p>First we need to define all the CPU-side structured (vertex format, constant format, etc.):</p>
+
+<pre><code>// vertex
+struct VertexData
+{
+    float3 position;
+    float2 texcoord0;
+    float2 texcoord1;
+    float3 normal;
+};
+StructuredBuffer&lt;VertexData&gt; g_VertexBuffer;
+StructuredBuffer&lt;uint&gt;       g_IndexBuffer;
+
+// pipeline state
+#define DRAW 0
+#define DRAW_INDEXED 1
+struct ConstantData
+{
+    uint4    internalData;
+
+    float4x4 World;
+    float4x4 View;
+    float4x4 Projection;
+};
+StructuredBuffer&lt;ConstantData&gt; g_ConstantBuffer;
+</code></pre>
+
+<p>After that goes the code that fetches constant data and processes vertices (pay attention to indexed/non-indexed geometry handling):</p>
+
+<pre><code>uint instanceID = input.instanceID;
+uint vertexID   = input.vertexID;
+
+uint vbID      = g_ConstantBuffer[instanceID].internalData[0];
+uint ibID      = g_ConstantBuffer[instanceID].internalData[1];
+uint drawType  = g_ConstantBuffer[instanceID].internalData[2];
+uint drawCount = g_ConstantBuffer[instanceID].internalData[3];
+
+VertexData vdata;
+[branch] if (drawType == DRAW_INDEXED) vdata = g_VertexBuffer[vbID + g_IndexBuffer[ibID + vertexID]];
+else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
+
+[flatten] if (vertexID &gt; drawCount)
+    vdata = g_VertexOutsideClipPlane; // discard vertex by moving it outside of the clip plane
+</code></pre>
+
+<p>As you can see - there is no rocket science. <a href="https://github.com/bazhenovc/sigrlinn/blob/master/shaders/dvp.hlsl">Full shader code for reference.</a></p>
+
+<p>An attentive reader will notice that I did not cover texturing. The next part is about it.</p>
+
+<h1 id="what-shall-we-do-with-textures">What shall we do with textures?</h1>
+
+<p>This is the biggest con of this method. With this approach it is highly desired to have unique textures per instance, but implementing this with D3D11 is problematic.</p>
+
+<p>Possible solutions:</p>
+
+<ul>
+<li>Use one texture atlas. Cons: One atlas cannot hold many textures, so you will need to batch instances by 3 or 4 and render them separately. This negates all the pros of this method.</li>
+<li>Use texture arrays (Texture2DArray, Sampler2DArray). Cons: better then texture atlas, but still limited to 2048 textures per array.</li>
+<li>Switch to OpenGL 4.3 with bindless textures. Cons: everything will fit, but there is one serious problem called OpenGL.</li>
+<li>Switch to D3D12/Mantle/Vulkan/etc. Cons: everything will fit, but with limited hardware/OS support.</li>
+<li>Virtual textures. Cons: virtual textures, anyone?:)</li>
+</ul>
+
+<p>Detailed overview of all these methods goes beyond this article. I will only say that I use texture arrays for D3D11 and native features of D3D12.</p>
+
+<h1 id="caveats-and-limitations">Caveats and limitations</h1>
+
+<p>All major cons are described above, thus here is a little summary:</p>
+
+<ul>
+<li>Wasted vertices overhead.</li>
+<li>Indirection overhead: vertex and constant access is badly predicted, because it is a random access, thus they are not cached and always calculated dynamically. Indexed rendering is the slowest one because of double indirection.</li>
+<li>Not all primitive topologies supported.</li>
+<li>Unique textures per instance are not possible in the general case.</li>
+<li>Reallocating buffers is expensive and adds video memory fragmentation.</li>
+<li>Unusual vertex buffers require unusual algorithms for unusual cases, like dynamically generating vertices with compute shader (e.g. water simulation, cloth, etc.).</li>
+
+<li><p>It is required to hold all the logical buffer data in memory, this slightly increasing application memory consumption.</p>
+
+<h1 id="demo-and-sources">Demo and sources</h1></li>
+</ul>
+
+<p>The main source code for this method is <a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc">here</a>. There is no binary version at the moment.</p>
+
+<p>Here are some screenshots:
+16384 unique cubes, 1.2ms per frame on Intel HD 4400:</p>
+
+<p><img src="/blog/dvp_cubes.png" alt="cubes" /></p>
+
+<p>4096 unique instances of grass, 200k triangles:</p>
+
+<p><img src="/blog/dvp_grass.png" alt="grass" /></p>
+
+<h1 id="further-reading">Further reading</h1>
+
+<p><a href="http://openglinsights.com/bendingthepipeline.html#ProgrammableVertexPulling">OpenGL Insights, III Bending the Pipeline, Programmable vertex pulling by Daniel Rakos</a> - almost the same method for OpenGL.</p>
+
+<p>Thanks for your attention!</p></div>
+
+  <footer class="article-footer">
+    
+    
+    
+    <section class="bordered">
+      <header>
+        <div class="panel-title">CATEGORIES</div>
+      </header>
+      <div>
+        <ul class="p-terms">
+          
+          <li><a href="https://bazhenovc.github.io/blog/categories/programming/">Programming</a></li>
+          
+          <li><a href="https://bazhenovc.github.io/blog/categories/graphics/">Graphics</a></li>
+          
+        </ul>
+      </div>
+    </section>
+    
+    
+    
+    <section class="bordered">
+      <header>
+        <div class="panel-title">TAGS</div>
+      </header>
+      <div>
+        <ul class="p-terms">
+          
+          <li><a href="https://bazhenovc.github.io/blog/tags/direct3d/">Direct3D</a></li>
+          
+          <li><a href="https://bazhenovc.github.io/blog/tags/direct3d-11/">Direct3D 11</a></li>
+          
+        </ul>
+      </div>
+    </section>
+    
+    
+  </footer>
+
+</article>
+
+
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+
+  <div class="col-md-4">
+    
+<aside class="l-sidebar">
+
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">LATESTS</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="list-group-item">Unordered Map Pitfall</a>
+      
+      <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="list-group-item">GPU Driven Occlusion Culling in Life is Feudal</a>
+      
+      <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="list-group-item">Dynamic vertex pulling with D3D11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/" class="list-group-item">Categories</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d/" class="list-group-item">Direct3d</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d-11/" class="list-group-item">Direct3d 11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/graphics/" class="list-group-item">Graphics</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/opengl/" class="list-group-item">Opengl</a>
+      
+    </div>
+  </section>
+
+  
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">CATEGORY</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/categories/programming" class="list-group-item">programming</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/graphics" class="list-group-item">graphics</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;" class="list-group-item">c&#43;&#43;</a>
+      
+    </div>
+  </section>
+  
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">TAG</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d" class="list-group-item">direct3d</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d-11" class="list-group-item">direct3d-11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;" class="list-group-item">c&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/opengl" class="list-group-item">opengl</a>
+      
+    </div>
+  </section>
+  
+
+</aside>
+
+
+  </div>
+</div>
+
+      </div>
+    </main>
+
+    <footer class="l-footer">
+      <div class="container">
+        <p><span class="h-logo">&copy; bazhenovc</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_beg">Beg</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+

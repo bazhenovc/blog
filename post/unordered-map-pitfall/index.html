@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+<meta name="pinterest" content="nopin">
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+
+
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/styles/solarized_dark.min.css">
+    <title>Unordered Map Pitfall - bazhenovc</title>
+    
+<meta name="description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+
+<meta property="og:title" content="Unordered Map Pitfall - bazhenovc">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+<meta property="og:image" content="https://bazhenovc.github.io/blog/images/default.png">
+<meta property="og:site_name" content="bazhenovc">
+<meta property="og:description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta property="og:locale" content="ja_JP">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="bazhenovc">
+<meta name="twitter:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+<meta name="twitter:title" content="Unordered Map Pitfall - bazhenovc">
+<meta name="twitter:description" content="&lt;p&gt;std::unordered_map implementation in MSVC has a major performance issue.&lt;/p&gt;&lt;p&gt;&lt;/p&gt;">
+<meta name="twitter:image" content="https://bazhenovc.github.io/blog/images/default.png">
+
+
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "NewsArticle",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id":"https://bazhenovc.github.io/blog/"
+    },
+    "headline": "Unordered Map Pitfall - bazhenovc",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https://bazhenovc.github.io/blog/images/default.png",
+      "height": 800,
+      "width": 800
+    },
+    "datePublished": "2017-12-15T17:54:23JST",
+    "dateModified": "2017-12-15T17:54:23JST",
+    "author": {
+      "@type": "Person",
+      "name": "bazhenovc"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "bazhenovc",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://bazhenovc.github.io/blog/images/logo.png",
+        "width": 600,
+        "height": 60
+      }
+    },
+    "description": "<p>std::unordered_map implementation in MSVC has a major performance issue.</p>
+
+<p></p>"
+  }
+</script>
+
+
+    <link href="https://bazhenovc.github.io/blog/css/styles.css" rel="stylesheet">
+  </head>
+
+  <body>
+    
+    
+    
+
+    <header class="l-header">
+      <nav class="navbar navbar-default">
+        <div class="container">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+          </div>
+
+          
+
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <div class="container">
+        
+<div class="row">
+  <div class="col-md-8">
+
+    <nav class="p-crumb">
+      <ol class="breadcrumb">
+        <li><a href="https://bazhenovc.github.io/blog/"><i class="fa fa-home" aria-hidden="true"></i></a></li>
+        
+        <li itemscope="" itemtype="http://data-vocabulary.org/Breadcrumb"><a href="https://bazhenovc.github.io/blog/post/" itemprop="url"><span itemprop="title">post</span></a></li>
+        
+        <li class="active">Unordered Map Pitfall</li>
+      </ol>
+    </nav>
+
+    <article class="single">
+  <header>
+    <ul class="p-facts">
+      <li><i class="fa fa-calendar" aria-hidden="true"></i><time datetime="2017-12-15T17:54:23JST">Dec 15, 2017</time></li>
+      <li><i class="fa fa-bookmark" aria-hidden="true"></i><a href="https://bazhenovc.github.io/blog/post/">post</a></li>
+      
+    </ul>
+
+    <h1 class="title">Unordered Map Pitfall</h1>
+  </header>
+
+  
+
+  <div class="article-body"><p>std::unordered_map implementation in MSVC has a major performance issue.</p>
+
+<p></p>
+
+<p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
+
+<p><unordered_map>:</p>
+
+<pre><code>        // TEMPLATE CLASS unordered_map
+template&lt;class _Kty,
+    class _Ty,
+    class _Hasher = hash&lt;_Kty&gt;,
+    class _Keyeq = equal_to&lt;_Kty&gt;,
+    class _Alloc = allocator&lt;pair&lt;const _Kty, _Ty&gt; &gt; &gt;
+    class unordered_map
+        : public _Hash&lt;_Umap_traits&lt;_Kty, _Ty,
+            _Uhash_compare&lt;_Kty, _Hasher, _Keyeq&gt;, _Alloc, false&gt; &gt;
+    {   // hash table of {key, mapped} values, unique keys
+    //
+    // Irrelevant code omitted
+    //
+    template&lt;class _Valty,
+        class = enable_if_t&lt;is_constructible&lt;value_type, _Valty&gt;::value&gt; &gt;
+        _Pairib insert(_Valty&amp;&amp; _Val)
+        {   // insert _Val
+        return (this-&gt;emplace(_STD forward&lt;_Valty&gt;(_Val)));
+        }
+</code></pre>
+
+<p>So, insert() calls this-&gt;emplace(&hellip;). Let&rsquo;s examine that method too:</p>
+
+<p><unordered_map>:</p>
+
+<pre><code>template&lt;class... _Valty&gt;
+    iterator emplace(_Valty&amp;&amp;... _Val)
+    {   // try to insert value_type(_Val...), favoring right side
+    return (_Mybase::emplace(_STD forward&lt;_Valty&gt;(_Val)...).first);
+    }
+</code></pre>
+
+<p>That routes it to _Mybase::emplace. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+
+<p><xhash>:</p>
+
+<pre><code>        // TEMPLATE CLASS _Hash
+template&lt;class _Traits&gt;
+    class _Hash
+    {   // hash table -- list with vector of iterators for quick access
+    //
+    // Irrelevant code omitted
+    //
+    template&lt;class... _Valty&gt;
+        _Pairib emplace(_Valty&amp;&amp;... _Val)
+        {   // try to insert value_type(_Val...)
+        _List.emplace_front(_STD forward&lt;_Valty&gt;(_Val)...);
+        return (_Insert(_List.front(), _Unchecked_begin()));
+        }
+</code></pre>
+
+<p>Oh wait, what&rsquo;s that?</p>
+
+<pre><code>typedef std::list&lt;...&gt; _Mylist;
+_Mylist _List;  // list of elements, must initialize before _Vec
+</code></pre>
+
+<p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
+
+<p><list>:
+        template<class... _Valty>
+            void emplace_front(_Valty&amp;&amp;&hellip; _Val)
+            {   // insert element at beginning
+            _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)&hellip;);
+            }
+        template<class... _Valty>
+            void _Insert(_Unchecked_const_iterator _Where,
+            _Valty&amp;&amp;&hellip; _Val)
+            {   // insert element at _Where
+            _Nodeptr _Pnode = _Where._Mynode();
+            _Nodeptr _Newnode =
+                this-&gt;_Buynode(_Pnode, this-&gt;_Prevnode(_Pnode),     /// We&rsquo;re interested in this one
+                    _STD forward&lt;_Valty&gt;(_Val)&hellip;);
+            // Irrelevant code omitted
+            }
+        // _Buynode
+        template<class... _Valty>
+        _Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+            _Valty&amp;&amp;&hellip; _Val)
+            {   // allocate a node and set links and value
+            _Nodeptr _Pnode = this-&gt;_Buynode0(_Next, _Prev);        /// It calls _Buynode0
+            // Irrelevant code omitted
+            }
+        // _Buynode0
+        _Nodeptr _Buynode0(_Nodeptr _Next,
+        _Nodeptr _Prev)
+            {   // allocate a node and set links
+            _Nodeptr _Pnode = _Getal().allocate(1);
+            // Irrelevant code omitted
+            }</p>
+
+<p>Here we go. _Buynode0 ALWAYS makes a small memory allocation for 1 element, thus in MSVC std::list ALWAYS allocates memory every single time something is inserted into it, thus std::unordered_map ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual insert() call.</p>
+
+<p>Thanks for reading!</p></div>
+
+  <footer class="article-footer">
+    
+    
+    
+    <section class="bordered">
+      <header>
+        <div class="panel-title">CATEGORIES</div>
+      </header>
+      <div>
+        <ul class="p-terms">
+          
+          <li><a href="https://bazhenovc.github.io/blog/categories/programming/">Programming</a></li>
+          
+          <li><a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/">C&#43;&#43;</a></li>
+          
+        </ul>
+      </div>
+    </section>
+    
+    
+    
+    <section class="bordered">
+      <header>
+        <div class="panel-title">TAGS</div>
+      </header>
+      <div>
+        <ul class="p-terms">
+          
+          <li><a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/">C&#43;&#43;</a></li>
+          
+        </ul>
+      </div>
+    </section>
+    
+    
+  </footer>
+
+</article>
+
+
+    <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+  </div>
+
+  <div class="col-md-4">
+    
+<aside class="l-sidebar">
+
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">LATESTS</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="list-group-item">Unordered Map Pitfall</a>
+      
+      <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="list-group-item">GPU Driven Occlusion Culling in Life is Feudal</a>
+      
+      <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="list-group-item">Dynamic vertex pulling with D3D11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;/" class="list-group-item">C&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/" class="list-group-item">Categories</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d/" class="list-group-item">Direct3d</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d-11/" class="list-group-item">Direct3d 11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/graphics/" class="list-group-item">Graphics</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/opengl/" class="list-group-item">Opengl</a>
+      
+    </div>
+  </section>
+
+  
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">CATEGORY</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/categories/programming" class="list-group-item">programming</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/graphics" class="list-group-item">graphics</a>
+      
+      <a href="https://bazhenovc.github.io/blog/categories/c&#43;&#43;" class="list-group-item">c&#43;&#43;</a>
+      
+    </div>
+  </section>
+  
+  <section class="panel panel-default">
+    <div class="panel-heading">
+      <div class="panel-title">TAG</div>
+    </div>
+    <div class="list-group">
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d" class="list-group-item">direct3d</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/direct3d-11" class="list-group-item">direct3d-11</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;" class="list-group-item">c&#43;&#43;</a>
+      
+      <a href="https://bazhenovc.github.io/blog/tags/opengl" class="list-group-item">opengl</a>
+      
+    </div>
+  </section>
+  
+
+</aside>
+
+
+  </div>
+</div>
+
+      </div>
+    </main>
+
+    <footer class="l-footer">
+      <div class="container">
+        <p><span class="h-logo">&copy; bazhenovc</span></p>
+        <aside>
+          <p>Powered by <a href="https://gohugo.io/">Hugo</a>.</p>
+          <p><a href="https://github.com/dim0627/hugo_theme_beg">Beg</a> designed by <a href="http://yet.unresolved.xyz/">Daisuke Tsuji</a>.</p>
+        </aside>
+      </div>
+    </footer>
+
+    <script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/8.4/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+  </body>
+</html>
+
