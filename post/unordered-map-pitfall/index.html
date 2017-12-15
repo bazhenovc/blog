@@ -191,7 +191,7 @@ th {
 
 <p><code>&lt;unordered_map&gt;</code>:</p>
 
-<pre><code class="language-cpp">        // TEMPLATE CLASS unordered_map
+<pre><code class="language-c++">        // TEMPLATE CLASS unordered_map
 template&lt;class _Kty,
     class _Ty,
     class _Hasher = hash&lt;_Kty&gt;,
@@ -215,7 +215,7 @@ template&lt;class _Kty,
 
 <p><code>&lt;unordered_map&gt;</code>:</p>
 
-<pre><code class="language-cpp">template&lt;class... _Valty&gt;
+<pre><code class="language-c++">template&lt;class... _Valty&gt;
     iterator emplace(_Valty&amp;&amp;... _Val)
     {   // try to insert value_type(_Val...), favoring right side
     return (_Mybase::emplace(_STD forward&lt;_Valty&gt;(_Val)...).first);
@@ -226,7 +226,7 @@ template&lt;class _Kty,
 
 <p><code>&lt;xhash&gt;</code>:</p>
 
-<pre><code class="language-cpp">        // TEMPLATE CLASS _Hash
+<pre><code class="language-c++">        // TEMPLATE CLASS _Hash
 template&lt;class _Traits&gt;
     class _Hash
     {   // hash table -- list with vector of iterators for quick access
@@ -245,7 +245,7 @@ template&lt;class _Traits&gt;
 
 <p><code>&lt;xhash&gt;</code>:</p>
 
-<pre><code class="language-cpp">typedef std::list&lt;...&gt; _Mylist;
+<pre><code class="language-c++">typedef std::list&lt;...&gt; _Mylist;
 _Mylist _List;  // list of elements, must initialize before _Vec
 </code></pre>
 
@@ -253,7 +253,7 @@ _Mylist _List;  // list of elements, must initialize before _Vec
 
 <p><code>&lt;list&gt;</code>:</p>
 
-<pre><code class="language-cpp">template&lt;class... _Valty&gt;
+<pre><code class="language-c++">template&lt;class... _Valty&gt;
     void emplace_front(_Valty&amp;&amp;... _Val)
     {   // insert element at beginning
     _Insert(_Unchecked_begin(), _STD forward&lt;_Valty&gt;(_Val)...);
