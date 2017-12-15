@@ -18,7 +18,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
 
 `<unordered_map>`:
 
-```cpp
+```c++
         // TEMPLATE CLASS unordered_map
 template<class _Kty,
     class _Ty,
@@ -43,7 +43,7 @@ So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
 `<unordered_map>`:
 
-```cpp
+```c++
 template<class... _Valty>
     iterator emplace(_Valty&&... _Val)
     {   // try to insert value_type(_Val...), favoring right side
@@ -55,7 +55,7 @@ That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's loo
 
 `<xhash>`:
 
-```cpp
+```c++
         // TEMPLATE CLASS _Hash
 template<class _Traits>
     class _Hash
@@ -75,7 +75,7 @@ Oh wait, what's that?
 
 `<xhash>`:
 
-```cpp
+```c++
 typedef std::list<...> _Mylist;
 _Mylist _List;  // list of elements, must initialize before _Vec
 ```
@@ -84,7 +84,7 @@ std::unordered_map uses std::list internally. Let's take a look at its methods a
 
 `<list>`:
 
-```cpp
+```c++
 template<class... _Valty>
     void emplace_front(_Valty&&... _Val)
     {   // insert element at beginning
