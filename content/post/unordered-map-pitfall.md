@@ -8,7 +8,7 @@ categories = [
 tags = ["C++"]
 +++
 
-std::unordered_map implementation in MSVC has a major performance issue.
+`std::unordered_map` implementation in MSVC has a major performance issue.
 
 <!--more-->
 
@@ -16,7 +16,7 @@ std::unordered_map implementation in MSVC has a major performance issue.
 
 Let's take a closer look at it. MSVC version is 2015, other versions are probably affected as well.
 
-`unordered_map`:
+`<unordered_map>`:
 
             // TEMPLATE CLASS unordered_map
     template<class _Kty,
@@ -39,7 +39,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
 
 So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
-`unordered_map`:
+`<unordered_map>`:
 
     template<class... _Valty>
         iterator emplace(_Valty&&... _Val)
@@ -49,7 +49,7 @@ So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
 That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's look for that as well.
 
-`xhash`:
+`<xhash>`:
 
             // TEMPLATE CLASS _Hash
     template<class _Traits>
@@ -67,12 +67,14 @@ That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's loo
 
 Oh wait, what's that?
 
+`<xhash>`:
+
     typedef std::list<...> _Mylist;
     _Mylist _List;  // list of elements, must initialize before _Vec
 
 std::unordered_map uses std::list internally. Let's take a look at its methods as well:
 
-`list`:
+`<list>`:
 
         template<class... _Valty>
             void emplace_front(_Valty&&... _Val)
@@ -101,7 +103,7 @@ std::unordered_map uses std::list internally. Let's take a look at its methods a
         _Nodeptr _Buynode0(_Nodeptr _Next,
         _Nodeptr _Prev)
             {   // allocate a node and set links
-            _Nodeptr _Pnode = _Getal().allocate(1);
+            _Nodeptr _Pnode = _Getal().allocate(1);                 // Whoa hello there!
             // Irrelevant code omitted
             }
 
