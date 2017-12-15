@@ -48,7 +48,7 @@ SectionPagesMenu = "main" # Enable menu system for lazy bloggers
 # https://shadow53.gitlab.io/BluestNight/docs/site/social-icons/
 #[Params.social]
 #    linkedin = "mylinkedinusername"
-    github = "bazhenovc"
+#    github = "bazhenovc"
 
 [Params.widgets]
     search = true                 # Enable a search bar widget
