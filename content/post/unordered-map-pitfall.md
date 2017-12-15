@@ -1,4 +1,4 @@
----
++++
 title: "Unordered Map Pitfall"
 date: 2017-12-15T17:54:23+03:00
 draft: false
@@ -6,7 +6,7 @@ categories = [
     "Programming", "C++"
 ]
 tags = ["C++"]
----
++++
 
 std::unordered_map implementation in MSVC has a major performance issue.
 
