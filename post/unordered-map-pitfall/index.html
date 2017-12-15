@@ -1,59 +1,130 @@
 <!DOCTYPE html>
 <html lang="en-us">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>bazhenovc</title>
+  <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+  <title>Unordered Map Pitfall &middot; bazhenovc - </title>
+  <meta name="generator" content="Hugo 0.31.1" />
+  
 
-  
-  
-  <meta name="author" content="Kirill Bazhenov" />
-  <meta name="description" content="std::unordered_map implementation in MSVC has a major performance issue.
+  <meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Unordered Map Pitfall"/>
+<meta name="twitter:description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+"/>
+
+  <meta property="og:title" content="Unordered Map Pitfall" />
+<meta property="og:description" content="std::unordered_map implementation in MSVC has a major performance issue.
 
 " />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" />
 
 
 
-<meta name="generator" content="Hugo 0.31.1" />
+<meta property="article:published_time" content="2017-12-15T17:54:23&#43;03:00"/>
+
+<meta property="article:modified_time" content="2017-12-15T17:54:23&#43;03:00"/>
 
 
-<link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" />
-<link rel="alternative" href="/blog/index.xml" title="bazhenovc" type="application/atom+xml" />
 
-<link href="https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.css" rel="stylesheet" >
-<link rel="stylesheet" href="/css/site.css">
+
+
+
+
+
+
+
+
+
+  <!-- RSS autodiscovery --> 
+
+  
+<meta itemprop="name" content="Unordered Map Pitfall">
+<meta itemprop="description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+">
+
+
+<meta itemprop="datePublished" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="dateModified" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="wordCount" content="419">
+
+
+
+<meta itemprop="keywords" content="C&#43;&#43;," />
+
+  <link href="https://fonts.googleapis.com/css?family=Lato:400" rel="stylesheet">
+  <link rel="stylesheet" href="https://bazhenovc.github.io/blog/css/style.css">
+  <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "WebSite",
+  "name": "bazhenovc",
+  "url": "https://bazhenovc.github.io/blog/post/unordered-map-pitfall/"
+}
+</script>
 
 </head>
 
 <body>
-  <div class="flip-container">
-    <div class="flipper">
-      <section class="front">
-        
-<nav class="ui top secondary menu">
-  <div class="item">
-    <i class="inverted big link bullseye icon dream-flip-toggle" title="Flip it!"></i>
-  </div>
-  <div class="item">
-    <a href="/">
-      <i class="inverted big home icon" title="Home"></i>
-    </a>
-  </div>
-</nav>
- 
-<div class="ui centered grid">
-  <div class="fifteen wide mobile eleven wide tablet eleven wide computer column post-list">
+  <header class="gheader">
+  <div class="container">
+    <nav class="navbar ">
+      <div class="navbar-brand">
+        <a class="navbar-item" href="https://bazhenovc.github.io/blog/">
+          <h1 class="brand">bazhenovc</h1>
+        </a>
 
-    <section class="ui secondary top attached black segment">
-      <header>
-        <h1 class="ui header">
-          Unordered Map Pitfall
-          <div class="sub header">@ Kirill Bazhenov · Dec 15, 2017 · 2 min read · Update at Dec 15, 2017</div>
-        </h1>
-      </header>
-      <article style="margin-top: 2rem; font-size: 1.4rem;"><p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
+        <div class="navbar-burger burger" data-target="navMenubd-example">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+
+      <div id="navMenubd-example" class="navbar-menu">
+        <div class="navbar-start">
+          
+        </div>
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+  <div class="main-content">
+    <div class="container">
+      
+  <article class="post">
+    <header class="post-header">
+      <h1 class="title">Unordered Map Pitfall</h1>
+      <div class="meta">
+        <time class="pub-time"  datetime="2017-12-15T17:54:23&#43;03:00">
+          2017.12.15
+        </time>
+        <div class="terms">
+          
+          <div class="categories">
+            
+              <a class="categories-item" href="/blog/categories/programming">Programming</a>
+            
+              <a class="categories-item" href="/blog/categories/c&#43;&#43;">C&#43;&#43;</a>
+            
+          </div>
+          
+          
+          <div class="tag">
+            
+              <a class="tag-item" href="/blog/tags/c&#43;&#43;">C&#43;&#43;</a>
+            
+          </div>
+          
+        </div>
+      </div>
+    </header>
+    <div class="post-body">
+      <p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
 
 <p></p>
 
@@ -163,229 +234,102 @@ _Mylist _List;  // list of elements, must initialize before _Vec
 
 <p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
 
-<p>Thanks for reading!</p></article>
-    </section>
+<p>Thanks for reading!</p>
+    </div>
+    <footer class="post-footer">
+      
+      <div class="share">
+        
+      </div>
 
-    <footer class="ui secondary attached segment dream-tags">
-      
-      
-      <a class="ui label" href="/blog/tags/c&#43;&#43;" title="C&#43;&#43;">C&#43;&#43;</a>
-      
-      
+      <div class="pagenation">
+        <ul class="pagenation-list">
+          
+          <li class="pager previous">
+            <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" data-toggle="tooltip" data-placement="top" title="GPU Driven Occlusion Culling in Life is Feudal">&larr; Previous Post</a>
+          </li>
+          
+          
+        </ul>
+      </div>
     </footer>
+  </article>
 
-    
-
-    
-    <footer class="ui secondary bottom attached stacked segment">
-      <div id="disqus_thread"></div>
-      <script>
-      
-
-      
-
-
-      var disqus_config = function () {
-      this.page.url = 'https:\/\/bazhenovc.github.io\/blog\/post\/unordered-map-pitfall\/';  
-      this.page.identifier = '\/blog\/post\/unordered-map-pitfall\/'; 
-      };
-
-      (function() { 
-      var d = document, s = d.createElement('script');
-      s.src = 'https://' + 'bazhenovcsblog' + '.disqus.com/embed.js';
-      s.setAttribute('data-timestamp', +new Date());
-      (d.head || d.body).appendChild(s);
-      })();
-      </script>
-      <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-    </footer>
-    
-
-  </div>
-  <div class="fifteen wide mobile four wide tablet four wide computer column">
-
-    <section class="ui top attached center aligned inverted segment">
-  <div class="ui small circular image">
-    
-    <img src="">
-    
-  </div>
-  <h3 class="ui header">Kirill Bazhenov&#39;s blog<div class="sub header" style="color: white;"></div>
-  </h3>
-  <a id="tag-category-pop" class="ui red right corner label">
-    <i class="pointing down icon" title="Click this to pop tags and categories"></i>
-  </a>
-</section>
-
-
-<section class="ui attached center aligned inverted segment dream-tags">
   
-  <a class="ui label" href="/blog/tags/c&#43;&#43;" title="c&#43;&#43;">c&#43;&#43;</a>
-  
-  <a class="ui label" href="/blog/tags/direct3d" title="direct3d">direct3d</a>
-  
-  <a class="ui label" href="/blog/tags/direct3d-11" title="direct3d-11">direct3d-11</a>
-  
-  <a class="ui label" href="/blog/tags/opengl" title="opengl">opengl</a>
-  
-</section>
+  <article class="related"></article>
+
+  <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "NewsArticle",
+  "mainEntityOfPage": {
+    "@type": "NewsArticle",
+    "@id": "https://bazhenovc.github.io/blog/post/unordered-map-pitfall/",
+    "headline": "std::unordered_map implementation in MSVC has a major performance issue.A story of unordered_map performance L",
+    "author": "",
+    "publisher": {
+      "@type": "Organization",
+      "name": "",
+      "logo": ""
+    },
+    "image": "",
+    "datePublished": "2017-12-15"
+  },
+  "headline": "std::unordered_map implementation in MSVC has a major performance issue.A story of unordered_map performance L",
+  "alternativeHeadline": "bazhenovc",
+  "datePublished": "2017-12-15",
+  "dateModified": "2017-12-15",
+  "url": "https://bazhenovc.github.io/blog/post/unordered-map-pitfall/",
+  "wordCount": "419",
+  "author": {
+    "@type": "Person",
+    "name": ""
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": ""
+  },
+  "image": "",
+  "genre": "ProgrammingC&#43;&#43;",
+  "keywords": "C&#43;&#43;",
+  "description": ""
+}
+</script>
+
+  <script type="application/ld+json">
+{
+  "@context": "http://schema.org",
+  "@type": "Person",
+  "@id": "https://bazhenovc.github.io/blog/post/unordered-map-pitfall/",
+  "name": ""
+}
+</script>
 
 
-
-<section class="ui attached inverted segment dream-categories">
-  <div class="ui inverted accordion">
-    
-    <div class="title">
-      <i class="dropdown icon"></i>
-      <a href="/blog/categories/c&#43;&#43;" class="item" style="color: white;">c&#43;&#43;</a>
     </div>
-    <div class="content">
-      <div class="ui link inverted list">
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="item">Unordered Map Pitfall</a>
+  </div>
+
+  <footer class="gfooter">
+  <div class="inner">
+    <div class="container">
+      <p class="copy"><small></small></p>
+
+      <nav class="footer-nav">
+        <div class="inner">
+          
         </div>
-      </div>
-      
-      </div>
-    </div>
-    
-    <div class="title">
-      <i class="dropdown icon"></i>
-      <a href="/blog/categories/graphics" class="item" style="color: white;">graphics</a>
-    </div>
-    <div class="content">
-      <div class="ui link inverted list">
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="item">GPU Driven Occlusion Culling in Life is Feudal</a>
-        </div>
-      </div>
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="item">Dynamic vertex pulling with D3D11</a>
-        </div>
-      </div>
-      
-      </div>
-    </div>
-    
-    <div class="title">
-      <i class="dropdown icon"></i>
-      <a href="/blog/categories/programming" class="item" style="color: white;">programming</a>
-    </div>
-    <div class="content">
-      <div class="ui link inverted list">
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" class="item">Unordered Map Pitfall</a>
-        </div>
-      </div>
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" class="item">GPU Driven Occlusion Culling in Life is Feudal</a>
-        </div>
-      </div>
-      
-      <div class="item" style="padding-left: 24px;">
-        <i class="cocktail icon"></i>
-        <div class="content">
-          <a href="https://bazhenovc.github.io/blog/post/d3d11-dynamic-vertex-pulling/" class="item">Dynamic vertex pulling with D3D11</a>
-        </div>
-      </div>
-      
-      </div>
-    </div>
-    
-  </div>
-</section>
-
-
-<section class="ui bottom attached center aligned inverted segment">
-    <p>© 2017 bazhenovc</p>
-    <p>Powered by <a href="https://gohugo.io/" target="_blank">Hugo</a> with theme <a href="https://github.com/g1eny0ung/hugo-theme-dream" target="_blank">Dream</a>.</p>
-</section>
-
-  </div>
-</div>
-
-      </section>
-      <section class="back">
-        <nav class="ui top secondary menu" style="overflow: scroll">
-  <div class="item">
-    <i class="inverted big link bullseye icon dream-flip-toggle" title="Flip it!"></i>
-  </div>
-  
-  
-  
-  
-  
-</nav>
-
-<div class="ui centered grid">
-  <div class="fifteen wide mobile fifteen wide tablet fifteen wide computer column">
-
-    <section class="ui stacked segments about">
-      <header class="ui inverted segment">
-        <h2 class="ui header">About me</h2>
-      </header>
-
-      <article class="ui inverted segment">
-        
-      </article>
-
-      
-
-      
-      <footer class="ui secondary segment">
-        <div id="disqus_thread"></div>
-        <script>
-        
-
-        
-
-
-        var disqus_config = function () {
-        this.page.url = 'https:\/\/bazhenovc.github.io\/blog\/post\/unordered-map-pitfall\//about';  
-        this.page.identifier = '/about'; 
-        };
-
-        (function() { 
-        var d = document, s = d.createElement('script');
-        s.src = 'https://' + 'bazhenovcsblog' + '.disqus.com/embed.js';
-        s.setAttribute('data-timestamp', +new Date());
-        (d.head || d.body).appendChild(s);
-        })();
-        </script>
-        <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-      </footer>
-      
-    </section>
-
-  </div>
-</div>
-
-      </section>
+      </nav>
     </div>
   </div>
+</footer>
 
-  
-<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-<script src="https://cdn.bootcss.com/semantic-ui/2.2.13/semantic.min.js"></script>
-<script src="/js/bg.js"></script>
-<script src="/js/site.js"></script>
 
+
+<script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
+<script src="https://bazhenovc.github.io/blog/js/script.js"></script>
 
 </body>
-
 </html>
