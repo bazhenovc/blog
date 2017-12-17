@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>C&#43;&#43; on bazhenovc</title>
+    <link>https://bazhenovc.github.io/blog/tags/c&#43;&#43;/</link>
+    <description>Recent content in C&#43;&#43; on bazhenovc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright (c) 2017, all rights reserved.</copyright>
+    <lastBuildDate>Fri, 15 Dec 2017 17:54:23 +0300</lastBuildDate>
+    
+	<atom:link href="https://bazhenovc.github.io/blog/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Unordered Map Pitfall</title>
+      <link>https://bazhenovc.github.io/blog/post/unordered-map-pitfall/</link>
+      <pubDate>Fri, 15 Dec 2017 17:54:23 +0300</pubDate>
+      
+      <guid>https://bazhenovc.github.io/blog/post/unordered-map-pitfall/</guid>
+      <description>&lt;p&gt;&lt;code&gt;std::unordered_map&lt;/code&gt; implementation in MSVC has a major performance issue.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>
