@@ -18,7 +18,7 @@ Let's take a closer look at it. MSVC version is 2015, other versions are probabl
 
 `<unordered_map>`:
 
-```c++
+{{< highlight cpp >}}
         // TEMPLATE CLASS unordered_map
 template<class _Kty,
     class _Ty,
@@ -37,25 +37,25 @@ template<class _Kty,
         {   // insert _Val
         return (this->emplace(_STD forward<_Valty>(_Val)));
         }
-```
+{{< /highlight >}}
 
 So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
 `<unordered_map>`:
 
-```c++
+{{< highlight cpp >}}
 template<class... _Valty>
     iterator emplace(_Valty&&... _Val)
     {   // try to insert value_type(_Val...), favoring right side
     return (_Mybase::emplace(_STD forward<_Valty>(_Val)...).first);
     }
-```
+{{< /highlight >}}
 
 That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's look for that as well.
 
 `<xhash>`:
 
-```c++
+{{< highlight cpp >}}
         // TEMPLATE CLASS _Hash
 template<class _Traits>
     class _Hash
@@ -69,22 +69,22 @@ template<class _Traits>
         _List.emplace_front(_STD forward<_Valty>(_Val)...);
         return (_Insert(_List.front(), _Unchecked_begin()));
         }
-```
+{{< /highlight >}}
 
 Oh wait, what's that?
 
 `<xhash>`:
 
-```c++
+{{< highlight cpp >}}
 typedef std::list<...> _Mylist;
 _Mylist _List;  // list of elements, must initialize before _Vec
-```
+{{< /highlight >}}
 
 std::unordered_map uses std::list internally. Let's take a look at its methods as well:
 
 `<list>`:
 
-```c++
+{{< highlight cpp >}}
 template<class... _Valty>
     void emplace_front(_Valty&&... _Val)
     {   // insert element at beginning
@@ -115,7 +115,7 @@ _Nodeptr _Prev)
     _Nodeptr _Pnode = _Getal().allocate(1); // Whoa hello there!
     // Irrelevant code omitted
     }
-```
+{{< /highlight >}}
 
 Here we go. `_Buynode0` ALWAYS makes a small memory allocation for 1 element, thus in MSVC `std::list` ALWAYS allocates memory every single time something is inserted into it, thus `std::unordered_map` ALWAYS allocates memory when new element is successfully inserted into it.
 
