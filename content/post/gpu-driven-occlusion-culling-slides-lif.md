@@ -86,11 +86,11 @@ GPU readback has high frame latency, so in order for this to work the depth buff
 
 The main caveat is that reprojection usually leaves big gaps in case of fast camera movements and various holes.
 
-![holes](/blog/oc_reprojection_holes.png)
+![holes](/oc_reprojection_holes.png)
 
 In order to fix them a simple dilation filter is applied, though it does not fix the gaps on the screen edges (note the gap on the right).
 
-![holes_fix](/blog/oc_reprojection_holes_fix.png)
+![holes_fix](/oc_reprojection_holes_fix.png)
 
 
 ### Summary
@@ -124,7 +124,7 @@ Here's a small comparison table for methods mentioned above.
 
 ## Occlusion culling with geometry shaders
 
-Arguably the first fully GPU driven occlusion culling method, pioneered by [Daniel Rákos](http://rastergrid.com/blog/downloads/mountains-demo/)
+Arguably the first fully GPU driven occlusion culling method, pioneered by [Daniel Rákos](http://rastergrid.com/downloads/mountains-demo/)
 
 The main idea is to render occludees as points (with bounding box data as attributes) and:
 
@@ -172,7 +172,7 @@ It works this way:
     - Adds exactly 1 frame latency, which is usually acceptable
 * No need to separate occluders and occludees - rasterization is dirt cheap, earlyZ also speeds things up
 
-![gpu_oc](/blog/gpu_oc.png)
+![gpu_oc](/gpu_oc.png)
 
 ### Summary
 
@@ -210,17 +210,17 @@ Cons:
 
 Here is the worst case when everything is visible and nothing is culled:
 
-![forest_view](/blog/lif_oc_forest.png)
-![forest_bounds](/blog/lif_oc_forest_bounds.png)
+![forest_view](/lif_oc_forest.png)
+![forest_bounds](/lif_oc_forest_bounds.png)
 
 Here is the best case when only a small fraction is visible:
 
-![forst_window](/blog/lif_oc_forest_window.png)
-![forst_window_bounds](/blog/lif_oc_forest_window_bounds.png)
+![forst_window](/lif_oc_forest_window.png)
+![forst_window_bounds](/lif_oc_forest_window_bounds.png)
 
 And here is what was actually rendered with occlusion culling on and off:
-![forst_window_rendered](/blog/lif_oc_forest_window_rendered.png)
-![forst_window_rendered_off](/blog/lif_oc_forest_window_rendered_off.png)
+![forst_window_rendered](/lif_oc_forest_window_rendered.png)
+![forst_window_rendered_off](/lif_oc_forest_window_rendered_off.png)
 
 ### Use case: static object rendering in Life is Feudal
 
@@ -235,17 +235,17 @@ And here is what was actually rendered with occlusion culling on and off:
 
 Here is a small diagram that shows all the relations between objects/shapes/IDs:
 
-![lif_oc_diagram](/blog/lif_oc_diagram.png)
+![lif_oc_diagram](/lif_oc_diagram.png)
 
 #### Managing occlusion shapes
 
 It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.
 
-![lif_oc_bounds](/blog/lif_oc_bounds.png)
+![lif_oc_bounds](/lif_oc_bounds.png)
 
 And here's the mess we've had on early implementation stages - due to the overdraw it gave us a negative performance impact!
 
-![lif_oc_mess](/blog/lif_oc_mess.png)
+![lif_oc_mess](/lif_oc_mess.png)
 
 #### Bounding box merging
 
@@ -258,11 +258,11 @@ Our occlusion shape management code allowed us to introduce a nice optimization 
     - Just add boxes for distant objects that are close enough to each other
     - Then use the produced box to cull all containing objects
 
-![lif_oc_boxmerge_diagram](/blog/lif_oc_boxmerge_diagram.png)
+![lif_oc_boxmerge_diagram](/lif_oc_boxmerge_diagram.png)
 
 And here's how it looks in practice:
 
-![lif_oc_boxmerge_result](/blog/lif_oc_boxmerge_result.png)
+![lif_oc_boxmerge_result](/lif_oc_boxmerge_result.png)
 
 ## Conclusions
 
@@ -278,7 +278,7 @@ And here's how it looks in practice:
 
 [Secrets of CryEngine 3 graphics technology](http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology)
 
-[Mountains demo](http://rastergrid.com/blog/downloads/mountains-demo/)
+[Mountains demo](http://rastergrid.com/downloads/mountains-demo/)
 
 [OpenGL occlusion culling](https://github.com/nvpro-samples/gl_occlusion_culling)
 
@@ -288,4 +288,4 @@ And here's how it looks in practice:
 
 Here's a nice DrawIndirect-related driver bug that I've found worth sharing:
 
-![lif_oc_drawindirect_bug](/blog/lif_oc_drawindirect_bug.png)
+![lif_oc_drawindirect_bug](/lif_oc_drawindirect_bug.png)
