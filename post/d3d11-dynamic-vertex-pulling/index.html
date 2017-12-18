@@ -226,14 +226,13 @@ ga('send', 'pageview');
 
 <p>In C++ this will look like this:</p>
 
-<pre><code>struct DXLogicalMeshBuffer final
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">struct</span> DXLogicalMeshBuffer <span style="color:#66d9ef">final</span>
 {
-    uint8_t* data             = nullptr;
-    size_t   dataSize         = 0;
-    size_t   dataFormatStride = 0;
-    size_t   physicalAddress  = 0;
-};
-</code></pre>
+    uint8_t<span style="color:#f92672">*</span> data             <span style="color:#f92672">=</span> <span style="color:#66d9ef">nullptr</span>;
+    size_t   dataSize         <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    size_t   dataFormatStride <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    size_t   physicalAddress  <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+};</code></pre></div>
 
 <p>The struct fields are used for:</p>
 
@@ -248,28 +247,27 @@ ga('send', 'pageview');
 
 <p>Physical buffer class looks like this:</p>
 
-<pre><code>struct DXPhysicalMeshBuffer final
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">struct</span> DXPhysicalMeshBuffer <span style="color:#66d9ef">final</span>
 {
-    ID3D11Buffer*             physicalBuffer     = nullptr;
-    ID3D11ShaderResourceView* physicalBufferView = nullptr;
-    size_t                    physicalDataSize   = 0;
-    bool                      isDirty            = false;
+    ID3D11Buffer<span style="color:#f92672">*</span>             physicalBuffer     <span style="color:#f92672">=</span> <span style="color:#66d9ef">nullptr</span>;
+    ID3D11ShaderResourceView<span style="color:#f92672">*</span> physicalBufferView <span style="color:#f92672">=</span> <span style="color:#66d9ef">nullptr</span>;
+    size_t                    physicalDataSize   <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+    <span style="color:#66d9ef">bool</span>                      isDirty            <span style="color:#f92672">=</span> false;
 
-    typedef DynamicArray&lt;DXLogicalMeshBuffer*&gt; PageArray;
+    <span style="color:#66d9ef">typedef</span> DynamicArray<span style="color:#f92672">&lt;</span>DXLogicalMeshBuffer<span style="color:#f92672">*&gt;</span> PageArray;
     PageArray allPages;
 
-    DXPhysicalMeshBuffer() = default;
-    inline ~DXPhysicalMeshBuffer()
+    DXPhysicalMeshBuffer() <span style="color:#f92672">=</span> <span style="color:#66d9ef">default</span>;
+    <span style="color:#66d9ef">inline</span> <span style="color:#f92672">~</span>DXPhysicalMeshBuffer()
     {
-        if (physicalBuffer != nullptr)     physicalBuffer-&gt;Release();
-        if (physicalBufferView != nullptr) physicalBufferView-&gt;Release();
+        <span style="color:#66d9ef">if</span> (physicalBuffer <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>)     physicalBuffer<span style="color:#f92672">-&gt;</span>Release();
+        <span style="color:#66d9ef">if</span> (physicalBufferView <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>) physicalBufferView<span style="color:#f92672">-&gt;</span>Release();
     }
 
-    void allocate(DXLogicalMeshBuffer* logicalBuffer);
-    void release(DXLogicalMeshBuffer* logicalBuffer);
-    void rebuildPages(); // very expensive operation
-}
-</code></pre>
+    <span style="color:#66d9ef">void</span> allocate(DXLogicalMeshBuffer<span style="color:#f92672">*</span> logicalBuffer);
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">release</span>(DXLogicalMeshBuffer<span style="color:#f92672">*</span> logicalBuffer);
+    <span style="color:#66d9ef">void</span> <span style="color:#a6e22e">rebuildPages</span>(); <span style="color:#75715e">// very expensive operation
+</span><span style="color:#75715e"></span>}</code></pre></div>
 
 <p>The class fields are used for:</p>
 
@@ -283,60 +281,57 @@ ga('send', 'pageview');
 
 <p>Each time a logical buffer is allocated/freed a physical buffer needs to be informed about this. Allocate/release operations are quite trivial:</p>
 
-<pre><code>void DXPhysicalBuffer::allocate(DXLogicalMeshBuffer* logicalBuffer)
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> DXPhysicalBuffer<span style="color:#f92672">::</span>allocate(DXLogicalMeshBuffer<span style="color:#f92672">*</span> logicalBuffer)
 {
     allPages.Add(logicalBuffer);
-    isDirty = true;
+    isDirty <span style="color:#f92672">=</span> true;
 }
 
-void DXPhysicalBuffer::release(DXLogicalMeshBuffer* logicalBuffer)
+<span style="color:#66d9ef">void</span> DXPhysicalBuffer<span style="color:#f92672">::</span>release(DXLogicalMeshBuffer<span style="color:#f92672">*</span> logicalBuffer)
 {
     allPages.Remove(logicalBuffer);
-    isDirty = true;
-}
-</code></pre>
+    isDirty <span style="color:#f92672">=</span> true;
+}</code></pre></div>
 
 <p>rebuildPages() method is much more interesting.</p>
 
 <p>This method must create a physical buffer and fill it with the data from all used logical buffers. A physical buffer must be mappable to RAM and bindable as a structured shader resource.</p>
 
-<pre><code>size_t vfStride = allPages[0]-&gt;dataFormatStride; // TODO: right now will not work with different strides
-size_t numElements = physicalDataSize / vfStride;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">size_t vfStride <span style="color:#f92672">=</span> allPages[<span style="color:#ae81ff">0</span>]<span style="color:#f92672">-&gt;</span>dataFormatStride; <span style="color:#75715e">// TODO: right now will not work with different strides
+</span><span style="color:#75715e"></span>size_t numElements <span style="color:#f92672">=</span> physicalDataSize <span style="color:#f92672">/</span> vfStride;
 
-if (physicalBuffer != nullptr)     physicalBuffer-&gt;Release();
-if (physicalBufferView != nullptr) physicalBufferView-&gt;Release();
+<span style="color:#66d9ef">if</span> (physicalBuffer <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>)     physicalBuffer<span style="color:#f92672">-&gt;</span>Release();
+<span style="color:#66d9ef">if</span> (physicalBufferView <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>) physicalBufferView<span style="color:#f92672">-&gt;</span>Release();
 
 D3D11_BUFFER_DESC bufferDesc;
-bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
-bufferDesc.ByteWidth           = physicalDataSize;
-bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
-bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-bufferDesc.StructureByteStride = vfStride;
-bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+bufferDesc.BindFlags           <span style="color:#f92672">=</span> D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           <span style="color:#f92672">=</span> physicalDataSize;
+bufferDesc.Usage               <span style="color:#f92672">=</span> D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           <span style="color:#f92672">=</span> D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride <span style="color:#f92672">=</span> vfStride;
+bufferDesc.CPUAccessFlags      <span style="color:#f92672">=</span> D3D11_CPU_ACCESS_WRITE;
 
-if (FAILED(g_pd3dDevice-&gt;CreateBuffer(&amp;bufferDesc, nullptr, &amp;physicalBuffer))) {
-    handleError(...); // handle your error here
-    return;
-}
-</code></pre>
+<span style="color:#66d9ef">if</span> (FAILED(g_pd3dDevice<span style="color:#f92672">-&gt;</span>CreateBuffer(<span style="color:#f92672">&amp;</span>bufferDesc, <span style="color:#66d9ef">nullptr</span>, <span style="color:#f92672">&amp;</span>physicalBuffer))) {
+    handleError(...); <span style="color:#75715e">// handle your error here
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
+}</code></pre></div>
 
 <p>Make sure that StructureByteStride is equal to the size of a structure read by the vertex shader. Also, CPU write access is required.</p>
 
 <p>After that we need to create a shader resource view:</p>
 
-<pre><code>D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-std::memset(&amp;viewDesc, 0, sizeof(viewDesc));
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+std<span style="color:#f92672">::</span>memset(<span style="color:#f92672">&amp;</span>viewDesc, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(viewDesc));
 
-viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
-viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
-viewDesc.Buffer.ElementWidth = numElements;
+viewDesc.Format              <span style="color:#f92672">=</span> DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       <span style="color:#f92672">=</span> D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth <span style="color:#f92672">=</span> numElements;
 
-if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(physicalBuffer, &amp;viewDesc, &amp;physicalBufferView)))
+<span style="color:#66d9ef">if</span> (FAILED(g_pd3dDevice<span style="color:#f92672">-&gt;</span>CreateShaderResourceView(physicalBuffer, <span style="color:#f92672">&amp;</span>viewDesc, <span style="color:#f92672">&amp;</span>physicalBufferView)))
 {
-    // TODO: error handling
-    return;
-}
-</code></pre>
+    <span style="color:#75715e">// TODO: error handling
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
+}</code></pre></div>
 
 <p>Whew. Now let us get straight to the physical buffer filling! The algorithm is:</p>
 
@@ -351,30 +346,29 @@ if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(physicalBuffer, &amp;viewDe
 
 <p>The code is quite simple:</p>
 
-<pre><code>// fill the physical buffer
-D3D11_MAPPED_SUBRESOURCE mappedData;
-std::memset(&amp;mappedData, 0, sizeof(mappedData));
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// fill the physical buffer
+</span><span style="color:#75715e"></span>D3D11_MAPPED_SUBRESOURCE mappedData;
+std<span style="color:#f92672">::</span>memset(<span style="color:#f92672">&amp;</span>mappedData, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(mappedData));
 
-if (FAILED(g_pImmediateContext-&gt;Map(physicalBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &amp;mappedData)))
+<span style="color:#66d9ef">if</span> (FAILED(g_pImmediateContext<span style="color:#f92672">-&gt;</span>Map(physicalBuffer, <span style="color:#ae81ff">0</span>, D3D11_MAP_WRITE_DISCARD, <span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>mappedData)))
 {
-    handleError(...); // insert error handling here
-    return;
+    handleError(...); <span style="color:#75715e">// insert error handling here
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
 }
 
-uint8_t* dataPtr = reinterpret_cast&lt;uint8_t*&gt;(mappedData.pData);
-size_t pageOffset = 0;
-for (size_t i = 0; i &lt; allPages.GetSize(); ++i) {
-    DXLogicalMeshBuffer* logicalBuffer = allPages[i];
-    // copy logical data to the mapped physical data
-    std::memcpy(dataPtr + pageOffset, logicalBuffer-&gt;data, logicalBuffer-&gt;dataSize);
-    // calculate physical address
-    logicalBuffer-&gt;physicalAddress = pageOffset / logicalBuffer-&gt;dataFormatStride;
-    // calculate offset
-    pageOffset += logicalBuffer-&gt;dataSize;
+uint8_t<span style="color:#f92672">*</span> dataPtr <span style="color:#f92672">=</span> <span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>uint8_t<span style="color:#f92672">*&gt;</span>(mappedData.pData);
+size_t pageOffset <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+<span style="color:#66d9ef">for</span> (size_t i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> allPages.GetSize(); <span style="color:#f92672">++</span>i) {
+    DXLogicalMeshBuffer<span style="color:#f92672">*</span> logicalBuffer <span style="color:#f92672">=</span> allPages[i];
+    <span style="color:#75715e">// copy logical data to the mapped physical data
+</span><span style="color:#75715e"></span>    std<span style="color:#f92672">::</span>memcpy(dataPtr <span style="color:#f92672">+</span> pageOffset, logicalBuffer<span style="color:#f92672">-&gt;</span>data, logicalBuffer<span style="color:#f92672">-&gt;</span>dataSize);
+    <span style="color:#75715e">// calculate physical address
+</span><span style="color:#75715e"></span>    logicalBuffer<span style="color:#f92672">-&gt;</span>physicalAddress <span style="color:#f92672">=</span> pageOffset <span style="color:#f92672">/</span> logicalBuffer<span style="color:#f92672">-&gt;</span>dataFormatStride;
+    <span style="color:#75715e">// calculate offset
+</span><span style="color:#75715e"></span>    pageOffset <span style="color:#f92672">+=</span> logicalBuffer<span style="color:#f92672">-&gt;</span>dataSize;
 }
 
-g_pImmediateContext-&gt;Unmap(physicalBuffer, 0);
-</code></pre>
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>Unmap(physicalBuffer, <span style="color:#ae81ff">0</span>);</code></pre></div>
 
 <p>Note that rebuilding a physical buffer is a very expensive operation, in our case it is around 500ms. This slowness is caused by the high amount of data that is being sent to the GPU (tens of megabytes!). This why it is not recommended to rebuild the physical buffer often.</p>
 
@@ -390,77 +384,74 @@ g_pImmediateContext-&gt;Unmap(physicalBuffer, 0);
 
 <p>Creating this buffer is trivial:</p>
 
-<pre><code>std::memset(&amp;bufferDesc, 0, sizeof(bufferDesc));
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">std<span style="color:#f92672">::</span>memset(<span style="color:#f92672">&amp;</span>bufferDesc, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(bufferDesc));
 
-bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
-bufferDesc.ByteWidth           = dataBufferSize;
-bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
-bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-bufferDesc.StructureByteStride = stride;
-bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+bufferDesc.BindFlags           <span style="color:#f92672">=</span> D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           <span style="color:#f92672">=</span> dataBufferSize;
+bufferDesc.Usage               <span style="color:#f92672">=</span> D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           <span style="color:#f92672">=</span> D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride <span style="color:#f92672">=</span> stride;
+bufferDesc.CPUAccessFlags      <span style="color:#f92672">=</span> D3D11_CPU_ACCESS_WRITE;
 
-if (FAILED(g_pd3dDevice-&gt;CreateBuffer(&amp;bufferDesc, nullptr, &amp;dataBuffer))) {
-    handleError(...); // handle your error here
-    return;
+<span style="color:#66d9ef">if</span> (FAILED(g_pd3dDevice<span style="color:#f92672">-&gt;</span>CreateBuffer(<span style="color:#f92672">&amp;</span>bufferDesc, <span style="color:#66d9ef">nullptr</span>, <span style="color:#f92672">&amp;</span>dataBuffer))) {
+    handleError(...); <span style="color:#75715e">// handle your error here
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
 }
 
 D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-std::memset(&amp;viewDesc, 0, sizeof(viewDesc));
+std<span style="color:#f92672">::</span>memset(<span style="color:#f92672">&amp;</span>viewDesc, <span style="color:#ae81ff">0</span>, <span style="color:#66d9ef">sizeof</span>(viewDesc));
 
-viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
-viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
-viewDesc.Buffer.ElementWidth = numInstances;
+viewDesc.Format              <span style="color:#f92672">=</span> DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       <span style="color:#f92672">=</span> D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth <span style="color:#f92672">=</span> numInstances;
 
-if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(dataBuffer, &amp;viewDesc, &amp;dataView))) {
-    handleError(...); // handle your error here
-    return;
-}
-</code></pre>
+<span style="color:#66d9ef">if</span> (FAILED(g_pd3dDevice<span style="color:#f92672">-&gt;</span>CreateShaderResourceView(dataBuffer, <span style="color:#f92672">&amp;</span>viewDesc, <span style="color:#f92672">&amp;</span>dataView))) {
+    handleError(...); <span style="color:#75715e">// handle your error here
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span>;
+}</code></pre></div>
 
 <p>First, four 32-bit registers of this buffer are filled with a shader internal data used for rendering. This data looks like this:</p>
 
-<pre><code>struct InternalData
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">struct</span> InternalData
 {
     uint32_t vb;
     uint32_t ib;
     uint32_t drawCallType;
     uint32_t count;
-};
-</code></pre>
+};</code></pre></div>
 
 <p>After this structure goes the usual constant data used for generic mesh rendering (such as projection matrix).</p>
 
 <p>Now a small digression. I usually don&rsquo;t render anything directly, instead I use an array of DrawCall structures, which also contain constants and all other data needed for a single DIP:</p>
 
-<pre><code>struct DrawCall final
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">struct</span> DrawCall <span style="color:#66d9ef">final</span>
 {
-    enum Type : uint32_t
+    <span style="color:#66d9ef">enum</span> Type : uint32_t
     {
-        Draw        = 0,
-        DrawIndexed = 1
+        Draw        <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>,
+        DrawIndexed <span style="color:#f92672">=</span> <span style="color:#ae81ff">1</span>
     };
 
-    enum
+    <span style="color:#66d9ef">enum</span>
     {
-        ConstantBufferSize = 2048 // TODO: remove hardcode
-    };
+        ConstantBufferSize <span style="color:#f92672">=</span> <span style="color:#ae81ff">2048</span> <span style="color:#75715e">// TODO: remove hardcode
+</span><span style="color:#75715e"></span>    };
 
-    enum
+    <span style="color:#66d9ef">enum</span>
     {
-        MaxTextures = 8
+        MaxTextures <span style="color:#f92672">=</span> <span style="color:#ae81ff">8</span>
     };
 
     uint8_t constantBufferData[ConstantBufferSize];
 
-    DXLogicalMeshBuffer* vertexBuffer;
-    DXLogicalMeshBuffer* indexBuffer;
+    DXLogicalMeshBuffer<span style="color:#f92672">*</span> vertexBuffer;
+    DXLogicalMeshBuffer<span style="color:#f92672">*</span> indexBuffer;
 
     uint32_t count;
     uint32_t startVertex;
     uint32_t startIndex;
     Type     type;
-};
-</code></pre>
+};</code></pre></div>
 
 <p>This is simplified to make reading easier.</p>
 
@@ -470,38 +461,37 @@ if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(dataBuffer, &amp;viewDesc, 
 
 <p>Updating constants is trivial, just loop through the command buffer and copy needed data to the right place:</p>
 
-<pre><code>// update constants
-{
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#75715e">// update constants
+</span><span style="color:#75715e"></span>{
     D3D11_MAPPED_SUBRESOURCE mappedData;
-    if (FAILED(g_pImmediateContext-&gt;Map(psimpl-&gt;constantBuffer.dataBuffer, 0, D3D11_MAP_WRITE_DISCARD,
-      0, &amp;mappedData))) {
-        // TODO: error handling
-        return;
+    <span style="color:#66d9ef">if</span> (FAILED(g_pImmediateContext<span style="color:#f92672">-&gt;</span>Map(psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataBuffer, <span style="color:#ae81ff">0</span>, D3D11_MAP_WRITE_DISCARD,
+      <span style="color:#ae81ff">0</span>, <span style="color:#f92672">&amp;</span>mappedData))) {
+        <span style="color:#75715e">// TODO: error handling
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span>;
     }
-    uint8_t* dataPtr = reinterpret_cast&lt;uint8_t*&gt;(mappedData.pData);
-    for (size_t i = 0; i &lt; numInstances; ++i) {
-        size_t offset = i * internal::DrawCall::ConstantBufferSize;
-        const internal::DrawCall&amp; call = queue-&gt;getDrawCalls()[i];
+    uint8_t<span style="color:#f92672">*</span> dataPtr <span style="color:#f92672">=</span> <span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>uint8_t<span style="color:#f92672">*&gt;</span>(mappedData.pData);
+    <span style="color:#66d9ef">for</span> (size_t i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> numInstances; <span style="color:#f92672">++</span>i) {
+        size_t offset <span style="color:#f92672">=</span> i <span style="color:#f92672">*</span> internal<span style="color:#f92672">::</span>DrawCall<span style="color:#f92672">::</span>ConstantBufferSize;
+        <span style="color:#66d9ef">const</span> internal<span style="color:#f92672">::</span>DrawCall<span style="color:#f92672">&amp;</span> call <span style="color:#f92672">=</span> queue<span style="color:#f92672">-&gt;</span>getDrawCalls()[i];
 
-        std::memcpy(dataPtr + offset, call.constantBufferData, internal::DrawCall::ConstantBufferSize);
+        std<span style="color:#f92672">::</span>memcpy(dataPtr <span style="color:#f92672">+</span> offset, call.constantBufferData, internal<span style="color:#f92672">::</span>DrawCall<span style="color:#f92672">::</span>ConstantBufferSize);
 
-        // fill internal data structure
-        InternalData* idata = reinterpret_cast&lt;InternalData*&gt;(dataPtr + offset);
+        <span style="color:#75715e">// fill internal data structure
+</span><span style="color:#75715e"></span>        InternalData<span style="color:#f92672">*</span> idata <span style="color:#f92672">=</span> <span style="color:#66d9ef">reinterpret_cast</span><span style="color:#f92672">&lt;</span>InternalData<span style="color:#f92672">*&gt;</span>(dataPtr <span style="color:#f92672">+</span> offset);
 
-        DXLogicalMeshBuffer* vertexBuffer = static_cast&lt;DXLogicalMeshBuffer*&gt;(call.vertexBuffer.value);
-        if (vertexBuffer != nullptr)
-            idata-&gt;vb = vertexBuffer-&gt;physicalAddress;
+        DXLogicalMeshBuffer<span style="color:#f92672">*</span> vertexBuffer <span style="color:#f92672">=</span> <span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>DXLogicalMeshBuffer<span style="color:#f92672">*&gt;</span>(call.vertexBuffer.value);
+        <span style="color:#66d9ef">if</span> (vertexBuffer <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>)
+            idata<span style="color:#f92672">-&gt;</span>vb <span style="color:#f92672">=</span> vertexBuffer<span style="color:#f92672">-&gt;</span>physicalAddress;
 
-        DXLogicalMeshBuffer* indexBuffer = static_cast&lt;DXLogicalMeshBuffer*&gt;(call.indexBuffer.value);
-        if (indexBuffer != nullptr)
-            idata-&gt;ib = indexBuffer-&gt;physicalAddress;
+        DXLogicalMeshBuffer<span style="color:#f92672">*</span> indexBuffer <span style="color:#f92672">=</span> <span style="color:#66d9ef">static_cast</span><span style="color:#f92672">&lt;</span>DXLogicalMeshBuffer<span style="color:#f92672">*&gt;</span>(call.indexBuffer.value);
+        <span style="color:#66d9ef">if</span> (indexBuffer <span style="color:#f92672">!=</span> <span style="color:#66d9ef">nullptr</span>)
+            idata<span style="color:#f92672">-&gt;</span>ib <span style="color:#f92672">=</span> indexBuffer<span style="color:#f92672">-&gt;</span>physicalAddress;
 
-        idata-&gt;drawCallType = call.type;
-        idata-&gt;count        = call.count;
+        idata<span style="color:#f92672">-&gt;</span>drawCallType <span style="color:#f92672">=</span> call.type;
+        idata<span style="color:#f92672">-&gt;</span>count        <span style="color:#f92672">=</span> call.count;
     }
-    g_pImmediateContext-&gt;Unmap(psimpl-&gt;constantBuffer.dataBuffer, 0);
-}
-</code></pre>
+    g_pImmediateContext<span style="color:#f92672">-&gt;</span>Unmap(psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataBuffer, <span style="color:#ae81ff">0</span>);
+}</code></pre></div>
 
 <p>The data is now ready for actual rendering.</p>
 
@@ -509,21 +499,20 @@ if (FAILED(g_pd3dDevice-&gt;CreateShaderResourceView(dataBuffer, &amp;viewDesc, 
 
 <p>Time for drawing! To render everything we need to set the buffers and issue DrawInstanced:</p>
 
-<pre><code>ID3D11ShaderResourceView* vbibViews[2] = {
-    g_physicalVertexBuffer-&gt;physicalBufferView,
-    g_physicalIndexBuffer-&gt;physicalBufferView
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">ID3D11ShaderResourceView<span style="color:#f92672">*</span> vbibViews[<span style="color:#ae81ff">2</span>] <span style="color:#f92672">=</span> {
+    g_physicalVertexBuffer<span style="color:#f92672">-&gt;</span>physicalBufferView,
+    g_physicalIndexBuffer<span style="color:#f92672">-&gt;</span>physicalBufferView
 };
 
-g_pImmediateContext-&gt;VSSetShaderResources(0, 2, vbibViews);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>VSSetShaderResources(<span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">2</span>, vbibViews);
 
-g_pImmediateContext-&gt;VSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
-g_pImmediateContext-&gt;HSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
-g_pImmediateContext-&gt;DSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
-g_pImmediateContext-&gt;GSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
-g_pImmediateContext-&gt;PSSetShaderResources(0 + 2, 1, &amp;psimpl-&gt;constantBuffer.dataView);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>VSSetShaderResources(<span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataView);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>HSSetShaderResources(<span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataView);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>DSSetShaderResources(<span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataView);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>GSSetShaderResources(<span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataView);
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>PSSetShaderResources(<span style="color:#ae81ff">0</span> <span style="color:#f92672">+</span> <span style="color:#ae81ff">2</span>, <span style="color:#ae81ff">1</span>, <span style="color:#f92672">&amp;</span>psimpl<span style="color:#f92672">-&gt;</span>constantBuffer.dataView);
 
-g_pImmediateContext-&gt;DrawInstanced(maxDrawCallVertexCount, numInstances, 0, 0);
-</code></pre>
+g_pImmediateContext<span style="color:#f92672">-&gt;</span>DrawInstanced(maxDrawCallVertexCount, numInstances, <span style="color:#ae81ff">0</span>, <span style="color:#ae81ff">0</span>);</code></pre></div>
 
 <p>Almost done. A few notes:</p>
 
@@ -537,7 +526,7 @@ g_pImmediateContext-&gt;DrawInstanced(maxDrawCallVertexCount, numInstances, 0, 0
 
 <p>First we need to define all the CPU-side structured (vertex format, constant format, etc.):</p>
 
-<pre><code>// vertex
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hlsl" data-lang="hlsl">// vertex
 struct VertexData
 {
     float3 position;
@@ -559,12 +548,11 @@ struct ConstantData
     float4x4 View;
     float4x4 Projection;
 };
-StructuredBuffer&lt;ConstantData&gt; g_ConstantBuffer;
-</code></pre>
+StructuredBuffer&lt;ConstantData&gt; g_ConstantBuffer;</code></pre></div>
 
 <p>After that goes the code that fetches constant data and processes vertices (pay attention to indexed/non-indexed geometry handling):</p>
 
-<pre><code>uint instanceID = input.instanceID;
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-hlsl" data-lang="hlsl">uint instanceID = input.instanceID;
 uint vertexID   = input.vertexID;
 
 uint vbID      = g_ConstantBuffer[instanceID].internalData[0];
@@ -577,8 +565,7 @@ VertexData vdata;
 else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 
 [flatten] if (vertexID &gt; drawCount)
-    vdata = g_VertexOutsideClipPlane; // discard vertex by moving it outside of the clip plane
-</code></pre>
+    vdata = g_VertexOutsideClipPlane; // discard vertex by moving it outside of the clip plane</code></pre></div>
 
 <p>As you can see - there is no rocket science. <a href="https://github.com/bazhenovc/sigrlinn/blob/master/shaders/dvp.hlsl">Full shader code for reference.</a></p>
 
