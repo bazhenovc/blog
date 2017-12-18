@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="Kirill Bazhenov" />
+<meta name="description" content="Personal blog." />
+<meta name="keywords" content="blog, tech" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/">
+<base href="https://bazhenovc.github.io/blog/" />
+<meta property="og:title" content="GPU Driven Occlusion Culling in Life is Feudal" />
+<meta property="og:description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/gpu-driven-occlusion-culling-slides-lif/" />
+
+
+
+<meta property="article:published_time" content="2017-02-02T03:26:00&#43;03:00"/>
+
+<meta property="article:modified_time" content="2017-02-02T03:26:00&#43;03:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="GPU Driven Occlusion Culling in Life is Feudal"/>
+<meta name="twitter:description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
+
+"/>
+
+
+
+<meta itemprop="name" content="GPU Driven Occlusion Culling in Life is Feudal">
+<meta itemprop="description" content="In 2016 I gave a small talk in Dublin, Ireland about the subj, here are the slides and below you can find a more or less human-readable version of the slides above.
+
+">
+
+
+<meta itemprop="datePublished" content="2017-02-02T03:26:00&#43;03:00" />
+<meta itemprop="dateModified" content="2017-02-02T03:26:00&#43;03:00" />
+<meta itemprop="wordCount" content="1526">
+
+
+
+<meta itemprop="keywords" content="Direct3D,Direct3D 11,OpenGL," />
+
+
+<link rel="stylesheet" href="css/layout.css" />
+<style type="text/css">
+body {
+  background-color: #101010;
+  color: #dbdbdb;
+}
+
+a { color: #dbdbdb; }
+
+pre {
+  background: #1D1F21;
+  border: 1px solid #dbdbdb;
+  border-radius: 5px;
+}
+
+code {
+  background: #1D1F21;
+}
+
+blockquote {
+  background: #1D1F21;
+  border-left: 3px solid #dbdbdb;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #dbdbdb;
+}
+
+th {
+  background: #dbdbdb;
+  color: #101010;
+}
+
+.siteTitle a { color: #99cc66; }
+
+.post .content h1{ color: #99cc66; }
+.post .content h2{ color: #99cc66; }
+.post .content h3{ color: #99cc66; }
+.post .content h4{ color: #99cc66; }
+.post .content h5{ color: #99cc66; }
+.post .content h6{ color: #99cc66; }
+.post .content a:hover { color: #99cc66; }
+.social-link:hover { color: #99cc66; }
+.nav-item-title:hover { color: #99cc66; }
+.tag a:hover { color: #99cc66; }
+.copyright { color: #404040 }
+.poweredby { color: #404040 }
+.poweredby a { color: #404040; }
+.post-preview .title a{ color: #99cc66; }
+.content-item a:hover{
+  text-decoration: underline;
+  color: #99cc66;
+}
+.post-list .title { color: #99cc66; }
+.rmore { color: #99cc66; }
+.terms .term a:hover {
+  text-decoration: underline;
+  color: #99cc66;
+}
+
+</style>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-111358204-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     GPU Driven Occlusion Culling in Life is Feudal 
+
+</title>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+    </div> 
+
+    
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/post/"><div class="nav-item-title">Posts</div></a>
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/tags/"><div class="nav-item-title">Tags</div></a>
+    
+
+  </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">gh</div></a>
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<article class="post">
+    <h1 class="title"> GPU Driven Occlusion Culling in Life is Feudal </h1>
+    <div class="content"> <p>In 2016 I gave a small talk in Dublin, Ireland about the subj, here are <a href="https://docs.google.com/presentation/d/1ArQwBnRmIaC-FxpuDbDlHHkRN4zql8c5QgIdbf7B-Ow/">the slides</a> and below you can find a more or less human-readable version of the slides above.</p>
+
+<p></p>
+
+<h2 id="table-of-contents">Table of contents</h2>
+
+<ul>
+<li>A quick history of the occlusion culling algorithms
+
+<ul>
+<li>Occlusion queries</li>
+<li>Software occlusion culling</li>
+<li>Coverage buffer</li>
+<li>GPU driven occlusion culling with geometry shaders</li>
+<li>GPU driven occlusion culling with compute and DrawIndirect / MultiDrawIndirect</li>
+</ul></li>
+<li>Occlusion queries vs Software occlusion culling vs Coverage buffer</li>
+<li>Occlusion culling with geometry shaders</li>
+<li>Occlusion culling with compute shaders</li>
+<li>Use cases and demos</li>
+</ul>
+
+<h2 id="occlusion-queries">Occlusion queries</h2>
+
+<p>This is the most ancient and used method - you render your scene in a special rendering mode with either D3D11_QUERY_OCCLUSION or GL_ARB_occlusion_query and after a few frames it will return you the amount of pixels pixel shader was invoked for.</p>
+
+<h3 id="summary">Summary</h3>
+
+<p>They are good because:</p>
+
+<ul>
+<li>Fast on the GPU</li>
+<li>Accurate enough</li>
+<li>Can save both CPU and GPU time because it is possible to skip CPU-side draw calls</li>
+<li>Can be used for shadow blockers (in theory)</li>
+</ul>
+
+<p>They are bad because:</p>
+
+<ul>
+<li>Require additional draw calls</li>
+<li>They require separating occluders from occludees and structruring the scene carefully</li>
+<li>They have high readback latency (up to 5 frames in extreme cases)
+
+<ul>
+<li>Even higher in case of multi GPU setups</li>
+</ul></li>
+<li>Pixel-to-visibility correlation is not obvious and awkward</li>
+</ul>
+
+<h2 id="software-occlusion-culling">Software occlusion culling</h2>
+
+<p>This technique uses software rasterization to render occluders to the downscaled depth buffer and test occludees against it. Everything is done on the CPU.</p>
+
+<p>The most recent paper on this is from <a href="https://software.intel.com/en-us/articles/software-occlusion-culling">Intel</a>.</p>
+
+<p>Intel suggest an efficient SIMD-optimized way to rasterize and test boxes agains a depth buffer.</p>
+
+<h3 id="summary-1">Summary</h3>
+
+<p>It is good because:</p>
+
+<ul>
+<li>Occlusion testing results are available immediately, frame latency is zero</li>
+<li>It saves GPU time at the cost of the CPU time
+
+<ul>
+<li>In theory can also save some CPU time IF skipped draw calls were more expensive then rasterization, but that is probably unrealistic</li>
+</ul></li>
+<li>Scales well with multithreading</li>
+</ul>
+
+<p>It is bad because:</p>
+
+<ul>
+<li>Software rasterization is SLOW on the CPU
+
+<ul>
+<li>can&rsquo;t use for shadow blockers, too slow</li>
+<li>can&rsquo;t have too much occluders, rasterization is slow</li>
+<li>can&rsquo;t have too much occludees, testing is not fast either</li>
+</ul></li>
+<li>Due to the fact above suits bad for dynamic scenes</li>
+<li>Bad for consoles, because requires high-end CPU (a selling feature for Intel?)</li>
+</ul>
+
+<h2 id="coverage-buffer">Coverage buffer</h2>
+
+<p>There&rsquo;s not much to say about it except that it is almost the same as software OC. The only difference is that instead of rasterizing occluders it reads the depth buffer from the GPU, downscales and reprojects it and tests occludees against it.</p>
+
+<p>Also, it reintroduces the nasty frame latency.</p>
+
+<p>It was pioneered by Unreal in 1997 and later used in production by <a href="http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology">Crytek</a></p>
+
+<h3 id="reprojection">Reprojection</h3>
+
+<p>GPU readback has high frame latency, so in order for this to work the depth buffer values must be unprojected using the previous frame matrices and projected back using the current frame matrices - this step is called reprojection.</p>
+
+<p>The main caveat is that reprojection usually leaves big gaps in case of fast camera movements and various holes.</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/oc_reprojection_holes.png" alt="holes" /></p>
+
+<p>In order to fix them a simple dilation filter is applied, though it does not fix the gaps on the screen edges (note the gap on the right).</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/oc_reprojection_holes_fix.png" alt="holes_fix" /></p>
+
+<h3 id="summary-2">Summary</h3>
+
+<p>It is good because:</p>
+
+<ul>
+<li>It is faster on CPU then software OC</li>
+<li>The whole world acts as a single occluder making it potentially more efficient</li>
+<li>Works better for outdoor scenes</li>
+<li>Everything else is the same as in software OC</li>
+</ul>
+
+<p>It is bad because:</p>
+
+<ul>
+<li>Reprojection leaves gaps and holes
+
+<ul>
+<li>Can&rsquo;t rely on depth that is 3-5 frames old</li>
+<li>Can&rsquo;t fully rely on reprojection</li>
+</ul></li>
+<li>Fast camera movement will leave big gaps that will occlude nothing</li>
+<li>Depth buffer readback has the same latency as occlusion queries</li>
+<li>Everything else is the same as in software OC</li>
+</ul>
+
+<h2 id="occlusion-queries-vs-software-occlusion-culling-vs-coverage-buffer">Occlusion queries vs Software occlusion culling vs Coverage buffer</h2>
+
+<p>Here&rsquo;s a small comparison table for methods mentioned above.</p>
+
+<table>
+<thead>
+<tr>
+<th>X</th>
+<th>Static world</th>
+<th>Dynamic world</th>
+<th>Indoor</th>
+<th>Outdoor</th>
+<th>Shadow blockers</th>
+</tr>
+</thead>
+
+<tbody>
+<tr>
+<td>Occlusion query</td>
+<td>OK</td>
+<td>Bad</td>
+<td>OK</td>
+<td>Bad</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>Software OC</td>
+<td>OK</td>
+<td>OK</td>
+<td>Good</td>
+<td>OK</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>Coverage buffer</td>
+<td>OK</td>
+<td>OK</td>
+<td>OK</td>
+<td>Good</td>
+<td>No</td>
+</tr>
+</tbody>
+</table>
+
+<h2 id="occlusion-culling-with-geometry-shaders">Occlusion culling with geometry shaders</h2>
+
+<p>Arguably the first fully GPU driven occlusion culling method, pioneered by <a href="http://rastergrid.com/blog/downloads/mountains-demo/">Daniel Rákos</a></p>
+
+<p>The main idea is to render occludees as points (with bounding box data as attributes) and:</p>
+
+<ul>
+<li>Vertex shader checks the bounding box agains the frustum</li>
+<li>If visible, sends the vertex to the geometry shader</li>
+<li>Geometry shader tests the box agains the downscaled depth buffer in a similar way software OC does
+
+<ul>
+<li>If test is passed then GS emits the primitive</li>
+</ul></li>
+<li>StreamOutput or TransformFeedback captures the emitted data</li>
+</ul>
+
+<h3 id="summary-3">Summary</h3>
+
+<p>Pros:</p>
+
+<ul>
+<li>It does frustum culling as a side-effect</li>
+<li>Zero CPU cost</li>
+<li>Does not require any kind of complex scene management</li>
+<li>Zero frame latency</li>
+<li>Handles lots of objects</li>
+<li>Works well for dynamic scenes</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul>
+<li>Needs some extra draw calls</li>
+<li>Need to predict buffer sizes somehow to avoid extra memory consumption</li>
+<li>Kills vertex cache (though can be fixed)</li>
+<li>Still uses a downscaled depth buffer</li>
+</ul>
+
+<h2 id="occlusion-culling-with-compute-shaders">Occlusion culling with compute shaders</h2>
+
+<p>The general idea is to implement software OC using the GPU for rasterization and testing, huh.</p>
+
+<p>This technique was pioneered by <a href="https://github.com/nvpro-samples/gl_occlusion_culling">NVidia</a></p>
+
+<p>It works this way:</p>
+
+<ul>
+<li>A simple pixel shader is used render occluders to the depth buffer
+
+<ul>
+<li>This shader knows object ID and has a writeable buffer attached that stores object visibility</li>
+<li>Pixels that pass depth test write visibility flag to that buffer by object ID</li>
+</ul></li>
+<li>A compute shader is dispatched for all objects
+
+<ul>
+<li>It reads visibility flag from the buffer</li>
+<li>If the flag is true it appends arguments for DrawIndirect / MultiDrawIndirect call</li>
+</ul></li>
+<li>DrawIndirect / MultiDrawIndirect everything!</li>
+<li>This also trivially extends to the Coverage buffer approach
+
+<ul>
+<li>Just use and optionally reproject depth buffer from the previous frame</li>
+<li>Adds exactly 1 frame latency, which is usually acceptable</li>
+</ul></li>
+<li>No need to separate occluders and occludees - rasterization is dirt cheap, earlyZ also speeds things up</li>
+</ul>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/gpu_oc.png" alt="gpu_oc" /></p>
+
+<h3 id="summary-4">Summary</h3>
+
+<p>Pros:</p>
+
+<ul>
+<li>Zero CPU cost</li>
+<li>All the pros from the software occlusion culling or software coverage buffer</li>
+<li>Zero frame latency for OC, 1 frame latency for CB
+
+<ul>
+<li>Coverage buffer might not need reprojection step due to low latency</li>
+</ul></li>
+<li>Scales extremely well</li>
+<li>Possible to use BVH which makes it even faster</li>
+<li>Shadowmaps? Why yes! Can easily use for shadow blockers
+
+<ul>
+<li>DrawIndirect does not kill vertex cache -&gt; no performance impact there</li>
+</ul></li>
+<li>Trivial to implement</li>
+<li>Extremely precise, no need to downscale at all</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul>
+<li>DX11+</li>
+<li>Indirect rendering is usually slower then usual rendering</li>
+<li>Requires that everything is rendered with instancing and batched efficiently, otherwise not efficient</li>
+</ul>
+
+<h3 id="use-case-forest-rendering-in-life-is-feudal">Use case: forest rendering in Life is Feudal</h3>
+
+<ul>
+<li>We use a quad tree to split the whole forest into cells
+
+<ul>
+<li>Each cells is used as a bounding volume for an area covered by trees</li>
+<li>Each cell is an occlusion volume</li>
+<li>Cells are rendered as a bounding boxes</li>
+</ul></li>
+<li>Cells are dynamic</li>
+<li>Trees are dynamic
+
+<ul>
+<li>Each tree can be cut, burned, grown, etc</li>
+<li>Massive tree destruction possible: forest fires, damage from siege machines, etc</li>
+</ul></li>
+<li>Forest is HUGE: 500k trees is a common ingame situation</li>
+<li>For forests we use a coverage buffer approach</li>
+</ul>
+
+<p>Here is the worst case when everything is visible and nothing is culled:</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest.png" alt="forest_view" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_bounds.png" alt="forest_bounds" /></p>
+
+<p>Here is the best case when only a small fraction is visible:</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window.png" alt="forst_window" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_bounds.png" alt="forst_window_bounds" /></p>
+
+<p>And here is what was actually rendered with occlusion culling on and off:
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered.png" alt="forst_window_rendered" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered_off.png" alt="forst_window_rendered_off" /></p>
+
+<h3 id="use-case-static-object-rendering-in-life-is-feudal">Use case: static object rendering in Life is Feudal</h3>
+
+<ul>
+<li>Works almost the same way as forests, but much more complex
+
+<ul>
+<li>Need two separate IDs for every object - for occlusion shape and object itself</li>
+<li>Each shape stores a list of objects it covers</li>
+<li>There&rsquo;s also a global buffer with object visibility</li>
+</ul></li>
+<li>Need indirection to map objects inside the shape to the global object buffer
+
+<ul>
+<li>This step is VERY counterintuitive, but manageable</li>
+</ul></li>
+<li>Also keep an eye for an overdraw
+
+<ul>
+<li>Try to minimize occlusion shape count, use big shapes to cover lots of objects</li>
+</ul></li>
+</ul>
+
+<p>Here is a small diagram that shows all the relations between objects/shapes/IDs:</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_diagram.png" alt="lif_oc_diagram" /></p>
+
+<h4 id="managing-occlusion-shapes">Managing occlusion shapes</h4>
+
+<p>It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_bounds.png" alt="lif_oc_bounds" /></p>
+
+<p>And here&rsquo;s the mess we&rsquo;ve had on early implementation stages - due to the overdraw it gave us a negative performance impact!</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_mess.png" alt="lif_oc_mess" /></p>
+
+<h4 id="bounding-box-merging">Bounding box merging</h4>
+
+<p>Our occlusion shape management code allowed us to introduce a nice optimization we call box merging.</p>
+
+<ul>
+<li>Main idea: distant objects can share one big bounding box
+
+<ul>
+<li>Because their screen projection is usually small and small boxes are usually bad</li>
+<li>And due to the same reason the error introduced by box merging is acceptable</li>
+</ul></li>
+<li>Implementation is trivial
+
+<ul>
+<li>Just add boxes for distant objects that are close enough to each other</li>
+<li>Then use the produced box to cull all containing objects</li>
+</ul></li>
+</ul>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_boxmerge_diagram.png" alt="lif_oc_boxmerge_diagram" /></p>
+
+<p>And here&rsquo;s how it looks in practice:</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_boxmerge_result.png" alt="lif_oc_boxmerge_result" /></p>
+
+<h2 id="conclusions">Conclusions</h2>
+
+<ul>
+<li>GPU driven occlusion culling is a must!</li>
+<li>Can easily switch between coverage buffer / conventional culling</li>
+<li>Low overhead and high scalability</li>
+<li>A great improvement over the previous methods</li>
+<li>DX11 demo source code: <a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc">https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc</a></li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<p><a href="https://software.intel.com/en-us/articles/software-occlusion-culling">Intel SOC</a></p>
+
+<p><a href="http://www.slideshare.net/TiagoAlexSousa/secrets-of-cryengine-3-graphics-technology">Secrets of CryEngine 3 graphics technology</a></p>
+
+<p><a href="http://rastergrid.com/blog/downloads/mountains-demo/">Mountains demo</a></p>
+
+<p><a href="https://github.com/nvpro-samples/gl_occlusion_culling">OpenGL occlusion culling</a></p>
+
+<p><a href="https://github.com/bazhenovc/sigrlinn/blob/master/demo/demo_grass.cc">SGFX Grass Demo</a></p>
+
+<h2 id="bug">Bug</h2>
+
+<p>Here&rsquo;s a nice DrawIndirect-related driver bug that I&rsquo;ve found worth sharing:</p>
+
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p> </div>
+    <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d">#Direct3D</a>
+      </div>
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d-11">#Direct3D 11</a>
+      </div>
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/opengl">#OpenGL</a>
+      </div>
+    
+</div>
+
+    <div class="date"> Feb 2, 2017 </div>
+  </div>
+
+</footer>
+
+
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</article>
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">Email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">GitHub</div></a>
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://bazhenovc.github.io/blog/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> Copyright (c) 2017, all rights reserved. </div>
+
+  <div class="poweredby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>.
+  </div>
+
+  </footer>
+
+</div> 
+
+</body>
+</html>
+

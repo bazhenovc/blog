@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="Kirill Bazhenov" />
+<meta name="description" content="Personal blog." />
+<meta name="keywords" content="blog, tech" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/">
+<base href="https://bazhenovc.github.io/blog/" />
+<meta property="og:title" content="Unordered Map Pitfall" />
+<meta property="og:description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/unordered-map-pitfall/" />
+
+
+
+<meta property="article:published_time" content="2017-12-15T17:54:23&#43;03:00"/>
+
+<meta property="article:modified_time" content="2017-12-15T17:54:23&#43;03:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Unordered Map Pitfall"/>
+<meta name="twitter:description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+"/>
+
+
+
+<meta itemprop="name" content="Unordered Map Pitfall">
+<meta itemprop="description" content="std::unordered_map implementation in MSVC has a major performance issue.
+
+">
+
+
+<meta itemprop="datePublished" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="dateModified" content="2017-12-15T17:54:23&#43;03:00" />
+<meta itemprop="wordCount" content="419">
+
+
+
+<meta itemprop="keywords" content="C&#43;&#43;," />
+
+
+<link rel="stylesheet" href="css/layout.css" />
+<style type="text/css">
+body {
+  background-color: #101010;
+  color: #dbdbdb;
+}
+
+a { color: #dbdbdb; }
+
+pre {
+  background: #1D1F21;
+  border: 1px solid #dbdbdb;
+  border-radius: 5px;
+}
+
+code {
+  background: #1D1F21;
+}
+
+blockquote {
+  background: #1D1F21;
+  border-left: 3px solid #dbdbdb;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #dbdbdb;
+}
+
+th {
+  background: #dbdbdb;
+  color: #101010;
+}
+
+.siteTitle a { color: #99cc66; }
+
+.post .content h1{ color: #99cc66; }
+.post .content h2{ color: #99cc66; }
+.post .content h3{ color: #99cc66; }
+.post .content h4{ color: #99cc66; }
+.post .content h5{ color: #99cc66; }
+.post .content h6{ color: #99cc66; }
+.post .content a:hover { color: #99cc66; }
+.social-link:hover { color: #99cc66; }
+.nav-item-title:hover { color: #99cc66; }
+.tag a:hover { color: #99cc66; }
+.copyright { color: #404040 }
+.poweredby { color: #404040 }
+.poweredby a { color: #404040; }
+.post-preview .title a{ color: #99cc66; }
+.content-item a:hover{
+  text-decoration: underline;
+  color: #99cc66;
+}
+.post-list .title { color: #99cc66; }
+.rmore { color: #99cc66; }
+.terms .term a:hover {
+  text-decoration: underline;
+  color: #99cc66;
+}
+
+</style>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-111358204-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Unordered Map Pitfall 
+
+</title>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+    </div> 
+
+    
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/post/"><div class="nav-item-title">Posts</div></a>
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/tags/"><div class="nav-item-title">Tags</div></a>
+    
+
+  </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">gh</div></a>
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<article class="post">
+    <h1 class="title"> Unordered Map Pitfall </h1>
+    <div class="content"> <p><code>std::unordered_map</code> implementation in MSVC has a major performance issue.</p>
+
+<p></p>
+
+<h1 id="a-story-of-unordered-map-performance">A story of unordered_map performance</h1>
+
+<p>Let&rsquo;s take a closer look at it. MSVC version is 2015, other versions are probably affected as well.</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">        <span style="color:#75715e">// TEMPLATE CLASS unordered_map
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Kty</span>,
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Ty</span>,
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Hasher</span> <span style="color:#f92672">=</span> hash<span style="color:#f92672">&lt;</span>_Kty<span style="color:#f92672">&gt;</span>,
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Keyeq</span> <span style="color:#f92672">=</span> equal_to<span style="color:#f92672">&lt;</span>_Kty<span style="color:#f92672">&gt;</span>,
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Alloc</span> <span style="color:#f92672">=</span> allocator<span style="color:#f92672">&lt;</span>pair<span style="color:#f92672">&lt;</span><span style="color:#66d9ef">const</span> _Kty, _Ty<span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">unordered_map</span>
+        <span style="color:#f92672">:</span> <span style="color:#66d9ef">public</span> _Hash<span style="color:#f92672">&lt;</span>_Umap_traits<span style="color:#f92672">&lt;</span>_Kty, _Ty,
+            _Uhash_compare<span style="color:#f92672">&lt;</span>_Kty, _Hasher, _Keyeq<span style="color:#f92672">&gt;</span>, _Alloc, false<span style="color:#f92672">&gt;</span> <span style="color:#f92672">&gt;</span>
+    {   <span style="color:#75715e">// hash table of {key, mapped} values, unique keys
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Irrelevant code omitted
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span> ... <span style="color:#f92672">&gt;</span>
+        _Pairib insert(_Valty<span style="color:#f92672">&amp;&amp;</span> _Val)
+        {   <span style="color:#75715e">// insert _Val
+</span><span style="color:#75715e"></span>        <span style="color:#66d9ef">return</span> (<span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>emplace(_STD forward<span style="color:#f92672">&lt;</span>_Valty<span style="color:#f92672">&gt;</span>(_Val)));
+        }</code></pre></div>
+
+<p>So, <code>insert()</code> calls <code>this-&gt;emplace(...)</code>. Let&rsquo;s examine that method too:</p>
+
+<p><code>&lt;unordered_map&gt;</code>:</p>
+
+<p><div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span>class... _Valty<span style="color:#f92672">&gt;</span>
+    iterator emplace(_Valty<span style="color:#f92672">&amp;&amp;</span>... _Val)
+    {   <span style="color:#75715e">// try to insert value_type(_Val...), favoring right side
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">return</span> (_Mybase<span style="color:#f92672">::</span>emplace(_STD forward<span style="color:#f92672">&lt;</span>_Valty<span style="color:#f92672">&gt;</span>(_Val)...).first);
+    }</code></pre></div></p>
+
+<p>That routes it to <code>_Mybase::emplace</code>. So far nothing too criminal, but let&rsquo;s look for that as well.</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp">        <span style="color:#75715e">// TEMPLATE CLASS _Hash
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span><span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Traits</span><span style="color:#f92672">&gt;</span>
+    <span style="color:#66d9ef">class</span> <span style="color:#a6e22e">_Hash</span>
+    {   <span style="color:#75715e">// hash table -- list with vector of iterators for quick access
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Irrelevant code omitted
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">//
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span>class... _Valty<span style="color:#f92672">&gt;</span>
+        _Pairib emplace(_Valty<span style="color:#f92672">&amp;&amp;</span>... _Val)
+        {   <span style="color:#75715e">// try to insert value_type(_Val...)
+</span><span style="color:#75715e"></span>        _List.emplace_front(_STD forward<span style="color:#f92672">&lt;</span>_Valty<span style="color:#f92672">&gt;</span>(_Val)...);
+        <span style="color:#66d9ef">return</span> (_Insert(_List.front(), _Unchecked_begin()));
+        }</code></pre></div>
+
+<p>Oh wait, what&rsquo;s that?</p>
+
+<p><code>&lt;xhash&gt;</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">typedef</span> std<span style="color:#f92672">::</span>list<span style="color:#f92672">&lt;</span>...<span style="color:#f92672">&gt;</span> _Mylist;
+_Mylist _List;  <span style="color:#f92672">//</span> list of elements, must initialize before _Vec</code></pre></div>
+
+<p>std::unordered_map uses std::list internally. Let&rsquo;s take a look at its methods as well:</p>
+
+<p><code>&lt;list&gt;</code>:</p>
+
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span>class... _Valty<span style="color:#f92672">&gt;</span>
+    <span style="color:#66d9ef">void</span> emplace_front(_Valty<span style="color:#f92672">&amp;&amp;</span>... _Val)
+    {   <span style="color:#75715e">// insert element at beginning
+</span><span style="color:#75715e"></span>    _Insert(_Unchecked_begin(), _STD forward<span style="color:#f92672">&lt;</span>_Valty<span style="color:#f92672">&gt;</span>(_Val)...);
+    }
+<span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span>class... _Valty<span style="color:#f92672">&gt;</span>
+    <span style="color:#66d9ef">void</span> _Insert(_Unchecked_const_iterator _Where,
+    _Valty<span style="color:#f92672">&amp;&amp;</span>... _Val)
+    {   <span style="color:#75715e">// insert element at _Where
+</span><span style="color:#75715e"></span>    _Nodeptr _Pnode <span style="color:#f92672">=</span> _Where._Mynode();
+    _Nodeptr _Newnode <span style="color:#f92672">=</span>
+        <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>_Buynode(_Pnode, <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>_Prevnode(_Pnode), <span style="color:#75715e">// We&#39;re interested in this one
+</span><span style="color:#75715e"></span>            _STD forward<span style="color:#f92672">&lt;</span>_Valty<span style="color:#f92672">&gt;</span>(_Val)...);
+    <span style="color:#75715e">// Irrelevant code omitted
+</span><span style="color:#75715e"></span>    }
+<span style="color:#75715e">// _Buynode
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">template</span><span style="color:#f92672">&lt;</span>class... _Valty<span style="color:#f92672">&gt;</span>
+_Nodeptr _Buynode(_Nodeptr _Next, _Nodeptr _Prev,
+    _Valty<span style="color:#f92672">&amp;&amp;</span>... _Val)
+    {   <span style="color:#75715e">// allocate a node and set links and value
+</span><span style="color:#75715e"></span>    _Nodeptr _Pnode <span style="color:#f92672">=</span> <span style="color:#66d9ef">this</span><span style="color:#f92672">-&gt;</span>_Buynode0(_Next, _Prev); <span style="color:#75715e">// It calls _Buynode0
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Irrelevant code omitted
+</span><span style="color:#75715e"></span>    }
+<span style="color:#75715e">// _Buynode0
+</span><span style="color:#75715e"></span>_Nodeptr _Buynode0(_Nodeptr _Next,
+_Nodeptr _Prev)
+    {   <span style="color:#75715e">// allocate a node and set links
+</span><span style="color:#75715e"></span>    _Nodeptr _Pnode <span style="color:#f92672">=</span> _Getal().allocate(<span style="color:#ae81ff">1</span>); <span style="color:#75715e">// Whoa hello there!
+</span><span style="color:#75715e"></span>    <span style="color:#75715e">// Irrelevant code omitted
+</span><span style="color:#75715e"></span>    }</code></pre></div>
+
+<p>Here we go. <code>_Buynode0</code> ALWAYS makes a small memory allocation for 1 element, thus in MSVC <code>std::list</code> ALWAYS allocates memory every single time something is inserted into it, thus <code>std::unordered_map</code> ALWAYS allocates memory when new element is successfully inserted into it.</p>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>I hope that I don&rsquo;t need to explain how bad this is: heap allocations are slow, also this may produce high memory fragmentation. Not to mention that this single allocation is a few times slower then the actual <code>insert()</code> call.</p>
+
+<p>Thanks for reading!</p> </div>
+    <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/c&#43;&#43;">#C&#43;&#43;</a>
+      </div>
+    
+</div>
+
+    <div class="date"> Dec 15, 2017 </div>
+  </div>
+
+</footer>
+
+
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</article>
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">Email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">GitHub</div></a>
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://bazhenovc.github.io/blog/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> Copyright (c) 2017, all rights reserved. </div>
+
+  <div class="poweredby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>.
+  </div>
+
+  </footer>
+
+</div> 
+
+</body>
+</html>
+
