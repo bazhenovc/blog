@@ -148,9 +148,9 @@ th {
 
     
     
-    <a class="nav-item" href="/blog/post/"><div class="nav-item-title">Posts</div></a>
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/post/"><div class="nav-item-title">Posts</div></a>
     
-    <a class="nav-item" href="/blog/tags/"><div class="nav-item-title">Tags</div></a>
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/tags/"><div class="nav-item-title">Tags</div></a>
     
 
   </nav>
@@ -281,11 +281,11 @@ th {
 
 <p>The main caveat is that reprojection usually leaves big gaps in case of fast camera movements and various holes.</p>
 
-<p><img src="/blog/oc_reprojection_holes.png" alt="holes" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/oc_reprojection_holes.png" alt="holes" /></p>
 
 <p>In order to fix them a simple dilation filter is applied, though it does not fix the gaps on the screen edges (note the gap on the right).</p>
 
-<p><img src="/blog/oc_reprojection_holes_fix.png" alt="holes_fix" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/oc_reprojection_holes_fix.png" alt="holes_fix" /></p>
 
 <h3 id="summary-2">Summary</h3>
 
@@ -428,7 +428,7 @@ th {
 <li>No need to separate occluders and occludees - rasterization is dirt cheap, earlyZ also speeds things up</li>
 </ul>
 
-<p><img src="/blog/gpu_oc.png" alt="gpu_oc" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/gpu_oc.png" alt="gpu_oc" /></p>
 
 <h3 id="summary-4">Summary</h3>
 
@@ -484,17 +484,17 @@ th {
 
 <p>Here is the worst case when everything is visible and nothing is culled:</p>
 
-<p><img src="/blog/lif_oc_forest.png" alt="forest_view" />
-<img src="/blog/lif_oc_forest_bounds.png" alt="forest_bounds" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest.png" alt="forest_view" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_bounds.png" alt="forest_bounds" /></p>
 
 <p>Here is the best case when only a small fraction is visible:</p>
 
-<p><img src="/blog/lif_oc_forest_window.png" alt="forst_window" />
-<img src="/blog/lif_oc_forest_window_bounds.png" alt="forst_window_bounds" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window.png" alt="forst_window" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_bounds.png" alt="forst_window_bounds" /></p>
 
 <p>And here is what was actually rendered with occlusion culling on and off:
-<img src="/blog/lif_oc_forest_window_rendered.png" alt="forst_window_rendered" />
-<img src="/blog/lif_oc_forest_window_rendered_off.png" alt="forst_window_rendered_off" /></p>
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered.png" alt="forst_window_rendered" />
+<img src="https://bazhenovc.github.io/blog/blog/lif_oc_forest_window_rendered_off.png" alt="forst_window_rendered_off" /></p>
 
 <h3 id="use-case-static-object-rendering-in-life-is-feudal">Use case: static object rendering in Life is Feudal</h3>
 
@@ -520,17 +520,17 @@ th {
 
 <p>Here is a small diagram that shows all the relations between objects/shapes/IDs:</p>
 
-<p><img src="/blog/lif_oc_diagram.png" alt="lif_oc_diagram" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_diagram.png" alt="lif_oc_diagram" /></p>
 
 <h4 id="managing-occlusion-shapes">Managing occlusion shapes</h4>
 
 <p>It is a very good idea to have big occlusion shapes that cover lots of objects. In LiF game our ingame objects are modular and made from smaller parts, so it is vital for us to cover as much as we can with a single shape.</p>
 
-<p><img src="/blog/lif_oc_bounds.png" alt="lif_oc_bounds" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_bounds.png" alt="lif_oc_bounds" /></p>
 
 <p>And here&rsquo;s the mess we&rsquo;ve had on early implementation stages - due to the overdraw it gave us a negative performance impact!</p>
 
-<p><img src="/blog/lif_oc_mess.png" alt="lif_oc_mess" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_mess.png" alt="lif_oc_mess" /></p>
 
 <h4 id="bounding-box-merging">Bounding box merging</h4>
 
@@ -551,11 +551,11 @@ th {
 </ul></li>
 </ul>
 
-<p><img src="/blog/lif_oc_boxmerge_diagram.png" alt="lif_oc_boxmerge_diagram" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_boxmerge_diagram.png" alt="lif_oc_boxmerge_diagram" /></p>
 
 <p>And here&rsquo;s how it looks in practice:</p>
 
-<p><img src="/blog/lif_oc_boxmerge_result.png" alt="lif_oc_boxmerge_result" /></p>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_boxmerge_result.png" alt="lif_oc_boxmerge_result" /></p>
 
 <h2 id="conclusions">Conclusions</h2>
 
@@ -583,7 +583,7 @@ th {
 
 <p>Here&rsquo;s a nice DrawIndirect-related driver bug that I&rsquo;ve found worth sharing:</p>
 
-<p><img src="/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p> </div>
+<p><img src="https://bazhenovc.github.io/blog/blog/lif_oc_drawindirect_bug.png" alt="lif_oc_drawindirect_bug" /></p> </div>
     <footer class="post-footer">
 
   <div class="post-footer-data">
@@ -591,15 +591,15 @@ th {
 <div class="tags">
     
       <div class="tag">
-        <a href="/tags/direct3d">#Direct3D</a>
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d">#Direct3D</a>
       </div>
     
       <div class="tag">
-        <a href="/tags/direct3d-11">#Direct3D 11</a>
+        <a href="https://bazhenovc.github.io/blog/tags/direct3d-11">#Direct3D 11</a>
       </div>
     
       <div class="tag">
-        <a href="/tags/opengl">#OpenGL</a>
+        <a href="https://bazhenovc.github.io/blog/tags/opengl">#OpenGL</a>
       </div>
     
 </div>
