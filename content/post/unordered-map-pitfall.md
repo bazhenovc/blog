@@ -12,7 +12,7 @@ tags = ["C++"]
 
 <!--more-->
 
-# A story of unordered_map performance
+# A story of std::unordered_map performance
 
 Let's take a closer look at it. MSVC version is 2015, other versions are probably affected as well.
 
