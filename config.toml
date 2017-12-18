@@ -4,7 +4,7 @@ baseurl = "https://bazhenovc.github.io/blog/"
 disqusShortname = "bazhenovcsblog"
 theme = "hugo-dusk"
 paginate = 10
-canonifyurls = true
+canonifyurls = false
 copyright = "Copyright (c) 2017, all rights reserved."
 
 [author]
@@ -13,7 +13,7 @@ copyright = "Copyright (c) 2017, all rights reserved."
 SectionPagesMenu = "main"
 
 # use Chroma for syntax highlight
-PygmentsStyle = "monokai" # other dark style options: vim, fruity, monokai
+PygmentsStyle = "native" # other dark style options: vim, fruity, monokai
 # enable syntax highlight for code blocks
 PygmentsCodeFences = true
 
