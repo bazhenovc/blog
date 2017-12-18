@@ -17,6 +17,7 @@ tags = ["C++"]
 Let's take a closer look at it. MSVC version is 2015, other versions are probably affected as well.
 
 `<unordered_map>`:
+
 {{< highlight cpp >}}
         // TEMPLATE CLASS unordered_map
 template<class _Kty,
@@ -37,9 +38,11 @@ template<class _Kty,
         return (this->emplace(_STD forward<_Valty>(_Val)));
         }
 {{< /highlight >}}
+
 So, `insert()` calls `this->emplace(...)`. Let's examine that method too:
 
 `<unordered_map>`:
+
 {{< highlight cpp >}}
 template<class... _Valty>
     iterator emplace(_Valty&&... _Val)
@@ -51,6 +54,7 @@ template<class... _Valty>
 That routes it to `_Mybase::emplace`. So far nothing too criminal, but let's look for that as well.
 
 `<xhash>`:
+
 {{< highlight cpp >}}
         // TEMPLATE CLASS _Hash
 template<class _Traits>
@@ -70,6 +74,7 @@ template<class _Traits>
 Oh wait, what's that?
 
 `<xhash>`:
+
 {{< highlight cpp >}}
 typedef std::list<...> _Mylist;
 _Mylist _List;  // list of elements, must initialize before _Vec
@@ -78,6 +83,7 @@ _Mylist _List;  // list of elements, must initialize before _Vec
 std::unordered_map uses std::list internally. Let's take a look at its methods as well:
 
 `<list>`:
+
 {{< highlight cpp >}}
 template<class... _Valty>
     void emplace_front(_Valty&&... _Val)
