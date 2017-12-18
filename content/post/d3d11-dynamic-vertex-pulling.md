@@ -46,14 +46,15 @@ A logical buffer is a data structure that contains physical buffer offset and a 
 
 In C++ this will look like this:
 
-
-    struct DXLogicalMeshBuffer final
-    {
-        uint8_t* data             = nullptr;
-        size_t   dataSize         = 0;
-        size_t   dataFormatStride = 0;
-        size_t   physicalAddress  = 0;
-    };
+{{< highlight cpp >}}
+struct DXLogicalMeshBuffer final
+{
+    uint8_t* data             = nullptr;
+    size_t   dataSize         = 0;
+    size_t   dataFormatStride = 0;
+    size_t   physicalAddress  = 0;
+};
+{{< /highlight >}}
 
 The struct fields are used for:
 
@@ -66,28 +67,29 @@ Upon logical buffer creation a physical buffer must know about the logical buffe
 
 Physical buffer class looks like this:
 
+{{< highlight cpp >}}
+struct DXPhysicalMeshBuffer final
+{
+    ID3D11Buffer*             physicalBuffer     = nullptr;
+    ID3D11ShaderResourceView* physicalBufferView = nullptr;
+    size_t                    physicalDataSize   = 0;
+    bool                      isDirty            = false;
 
-    struct DXPhysicalMeshBuffer final
+    typedef DynamicArray<DXLogicalMeshBuffer*> PageArray;
+    PageArray allPages;
+
+    DXPhysicalMeshBuffer() = default;
+    inline ~DXPhysicalMeshBuffer()
     {
-        ID3D11Buffer*             physicalBuffer     = nullptr;
-        ID3D11ShaderResourceView* physicalBufferView = nullptr;
-        size_t                    physicalDataSize   = 0;
-        bool                      isDirty            = false;
-
-        typedef DynamicArray<DXLogicalMeshBuffer*> PageArray;
-        PageArray allPages;
-
-        DXPhysicalMeshBuffer() = default;
-        inline ~DXPhysicalMeshBuffer()
-        {
-            if (physicalBuffer != nullptr)     physicalBuffer->Release();
-            if (physicalBufferView != nullptr) physicalBufferView->Release();
-        }
-
-        void allocate(DXLogicalMeshBuffer* logicalBuffer);
-        void release(DXLogicalMeshBuffer* logicalBuffer);
-        void rebuildPages(); // very expensive operation
+        if (physicalBuffer != nullptr)     physicalBuffer->Release();
+        if (physicalBufferView != nullptr) physicalBufferView->Release();
     }
+
+    void allocate(DXLogicalMeshBuffer* logicalBuffer);
+    void release(DXLogicalMeshBuffer* logicalBuffer);
+    void rebuildPages(); // very expensive operation
+}
+{{< /highlight >}}
 
 The class fields are used for:
 
@@ -99,60 +101,63 @@ The class fields are used for:
 
 Each time a logical buffer is allocated/freed a physical buffer needs to be informed about this. Allocate/release operations are quite trivial:
 
+{{< highlight cpp >}}
+void DXPhysicalBuffer::allocate(DXLogicalMeshBuffer* logicalBuffer)
+{
+    allPages.Add(logicalBuffer);
+    isDirty = true;
+}
 
-    void DXPhysicalBuffer::allocate(DXLogicalMeshBuffer* logicalBuffer)
-    {
-        allPages.Add(logicalBuffer);
-        isDirty = true;
-    }
-
-    void DXPhysicalBuffer::release(DXLogicalMeshBuffer* logicalBuffer)
-    {
-        allPages.Remove(logicalBuffer);
-        isDirty = true;
-    }
+void DXPhysicalBuffer::release(DXLogicalMeshBuffer* logicalBuffer)
+{
+    allPages.Remove(logicalBuffer);
+    isDirty = true;
+}
+{{< /highlight >}}
 
 rebuildPages() method is much more interesting.
 
 This method must create a physical buffer and fill it with the data from all used logical buffers. A physical buffer must be mappable to RAM and bindable as a structured shader resource.
 
+{{< highlight cpp >}}
+size_t vfStride = allPages[0]->dataFormatStride; // TODO: right now will not work with different strides
+size_t numElements = physicalDataSize / vfStride;
 
-    size_t vfStride = allPages[0]->dataFormatStride; // TODO: right now will not work with different strides
-    size_t numElements = physicalDataSize / vfStride;
+if (physicalBuffer != nullptr)     physicalBuffer->Release();
+if (physicalBufferView != nullptr) physicalBufferView->Release();
 
-    if (physicalBuffer != nullptr)     physicalBuffer->Release();
-    if (physicalBufferView != nullptr) physicalBufferView->Release();
+D3D11_BUFFER_DESC bufferDesc;
+bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           = physicalDataSize;
+bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride = vfStride;
+bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
 
-    D3D11_BUFFER_DESC bufferDesc;
-    bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
-    bufferDesc.ByteWidth           = physicalDataSize;
-    bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
-    bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-    bufferDesc.StructureByteStride = vfStride;
-    bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
-
-    if (FAILED(g_pd3dDevice->CreateBuffer(&bufferDesc, nullptr, &physicalBuffer))) {
-        handleError(...); // handle your error here
-        return;
-    }
+if (FAILED(g_pd3dDevice->CreateBuffer(&bufferDesc, nullptr, &physicalBuffer))) {
+    handleError(...); // handle your error here
+    return;
+}
+{{< /highlight >}}
 
 Make sure that StructureByteStride is equal to the size of a structure read by the vertex shader. Also, CPU write access is required.
 
 After that we need to create a shader resource view:
 
+{{< highlight cpp >}}
+D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+std::memset(&viewDesc, 0, sizeof(viewDesc));
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-    std::memset(&viewDesc, 0, sizeof(viewDesc));
+viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth = numElements;
 
-    viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
-    viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
-    viewDesc.Buffer.ElementWidth = numElements;
-
-    if (FAILED(g_pd3dDevice->CreateShaderResourceView(physicalBuffer, &viewDesc, &physicalBufferView)))
-    {
-        // TODO: error handling
-        return;
-    }
+if (FAILED(g_pd3dDevice->CreateShaderResourceView(physicalBuffer, &viewDesc, &physicalBufferView)))
+{
+    // TODO: error handling
+    return;
+}
+{{< /highlight >}}
 
 Whew. Now let us get straight to the physical buffer filling! The algorithm is:
 
@@ -165,29 +170,31 @@ Whew. Now let us get straight to the physical buffer filling! The algorithm is:
 
 The code is quite simple:
 
-    // fill the physical buffer
-    D3D11_MAPPED_SUBRESOURCE mappedData;
-    std::memset(&mappedData, 0, sizeof(mappedData));
+{{< highlight cpp >}}
+// fill the physical buffer
+D3D11_MAPPED_SUBRESOURCE mappedData;
+std::memset(&mappedData, 0, sizeof(mappedData));
 
-    if (FAILED(g_pImmediateContext->Map(physicalBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData)))
-    {
-        handleError(...); // insert error handling here
-        return;
-    }
+if (FAILED(g_pImmediateContext->Map(physicalBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedData)))
+{
+    handleError(...); // insert error handling here
+    return;
+}
 
-    uint8_t* dataPtr = reinterpret_cast<uint8_t*>(mappedData.pData);
-    size_t pageOffset = 0;
-    for (size_t i = 0; i < allPages.GetSize(); ++i) {
-        DXLogicalMeshBuffer* logicalBuffer = allPages[i];
-        // copy logical data to the mapped physical data
-        std::memcpy(dataPtr + pageOffset, logicalBuffer->data, logicalBuffer->dataSize);
-        // calculate physical address
-        logicalBuffer->physicalAddress = pageOffset / logicalBuffer->dataFormatStride;
-        // calculate offset
-        pageOffset += logicalBuffer->dataSize;
-    }
+uint8_t* dataPtr = reinterpret_cast<uint8_t*>(mappedData.pData);
+size_t pageOffset = 0;
+for (size_t i = 0; i < allPages.GetSize(); ++i) {
+    DXLogicalMeshBuffer* logicalBuffer = allPages[i];
+    // copy logical data to the mapped physical data
+    std::memcpy(dataPtr + pageOffset, logicalBuffer->data, logicalBuffer->dataSize);
+    // calculate physical address
+    logicalBuffer->physicalAddress = pageOffset / logicalBuffer->dataFormatStride;
+    // calculate offset
+    pageOffset += logicalBuffer->dataSize;
+}
 
-    g_pImmediateContext->Unmap(physicalBuffer, 0);
+g_pImmediateContext->Unmap(physicalBuffer, 0);
+{{< /highlight >}}
 
 Note that rebuilding a physical buffer is a very expensive operation, in our case it is around 500ms. This slowness is caused by the high amount of data that is being sent to the GPU (tens of megabytes!). This why it is not recommended to rebuild the physical buffer often.
 
@@ -203,77 +210,80 @@ Apart from usual shader constants this buffer must contain logical buffer inform
 
 Creating this buffer is trivial:
 
+{{< highlight cpp >}}
+std::memset(&bufferDesc, 0, sizeof(bufferDesc));
 
-    std::memset(&bufferDesc, 0, sizeof(bufferDesc));
+bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
+bufferDesc.ByteWidth           = dataBufferSize;
+bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
+bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+bufferDesc.StructureByteStride = stride;
+bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
 
-    bufferDesc.BindFlags           = D3D11_BIND_SHADER_RESOURCE;
-    bufferDesc.ByteWidth           = dataBufferSize;
-    bufferDesc.Usage               = D3D11_USAGE_DYNAMIC;
-    bufferDesc.MiscFlags           = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-    bufferDesc.StructureByteStride = stride;
-    bufferDesc.CPUAccessFlags      = D3D11_CPU_ACCESS_WRITE;
+if (FAILED(g_pd3dDevice->CreateBuffer(&bufferDesc, nullptr, &dataBuffer))) {
+    handleError(...); // handle your error here
+    return;
+}
 
-    if (FAILED(g_pd3dDevice->CreateBuffer(&bufferDesc, nullptr, &dataBuffer))) {
-        handleError(...); // handle your error here
-        return;
-    }
+D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
+std::memset(&viewDesc, 0, sizeof(viewDesc));
 
-    D3D11_SHADER_RESOURCE_VIEW_DESC viewDesc;
-    std::memset(&viewDesc, 0, sizeof(viewDesc));
+viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
+viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
+viewDesc.Buffer.ElementWidth = numInstances;
 
-    viewDesc.Format              = DXGI_FORMAT_UNKNOWN;
-    viewDesc.ViewDimension       = D3D11_SRV_DIMENSION_BUFFER;
-    viewDesc.Buffer.ElementWidth = numInstances;
-
-    if (FAILED(g_pd3dDevice->CreateShaderResourceView(dataBuffer, &viewDesc, &dataView))) {
-        handleError(...); // handle your error here
-        return;
-    }
+if (FAILED(g_pd3dDevice->CreateShaderResourceView(dataBuffer, &viewDesc, &dataView))) {
+    handleError(...); // handle your error here
+    return;
+}
+{{< /highlight >}}
 
 First, four 32-bit registers of this buffer are filled with a shader internal data used for rendering. This data looks like this:
 
-
-    struct InternalData
-    {
-        uint32_t vb;
-        uint32_t ib;
-        uint32_t drawCallType;
-        uint32_t count;
-    };
+{{< highlight cpp >}}
+struct InternalData
+{
+    uint32_t vb;
+    uint32_t ib;
+    uint32_t drawCallType;
+    uint32_t count;
+};
+{{< /highlight >}}
 
 After this structure goes the usual constant data used for generic mesh rendering (such as projection matrix).
 
 Now a small digression. I usually don't render anything directly, instead I use an array of DrawCall structures, which also contain constants and all other data needed for a single DIP:
 
-
-    struct DrawCall final
+{{< highlight cpp >}}
+struct DrawCall final
+{
+    enum Type : uint32_t
     {
-        enum Type : uint32_t
-        {
-            Draw        = 0,
-            DrawIndexed = 1
-        };
-
-        enum
-        {
-            ConstantBufferSize = 2048 // TODO: remove hardcode
-        };
-
-        enum
-        {
-            MaxTextures = 8
-        };
-
-        uint8_t constantBufferData[ConstantBufferSize];
-
-        DXLogicalMeshBuffer* vertexBuffer;
-        DXLogicalMeshBuffer* indexBuffer;
-
-        uint32_t count;
-        uint32_t startVertex;
-        uint32_t startIndex;
-        Type     type;
+        Draw        = 0,
+        DrawIndexed = 1
     };
+
+    enum
+    {
+        ConstantBufferSize = 2048 // TODO: remove hardcode
+    };
+
+    enum
+    {
+        MaxTextures = 8
+    };
+
+    uint8_t constantBufferData[ConstantBufferSize];
+
+    DXLogicalMeshBuffer* vertexBuffer;
+    DXLogicalMeshBuffer* indexBuffer;
+
+    uint32_t count;
+    uint32_t startVertex;
+    uint32_t startIndex;
+    Type     type;
+};
+{{< /highlight >}}
 
 This is simplified to make reading easier.
 
@@ -283,38 +293,39 @@ After filling this draw call buffer we need to update the constant buffer, updat
 
 Updating constants is trivial, just loop through the command buffer and copy needed data to the right place:
 
-
-    // update constants
-    {
-        D3D11_MAPPED_SUBRESOURCE mappedData;
-        if (FAILED(g_pImmediateContext->Map(psimpl->constantBuffer.dataBuffer, 0, D3D11_MAP_WRITE_DISCARD,
-          0, &mappedData))) {
-            // TODO: error handling
-            return;
-        }
-        uint8_t* dataPtr = reinterpret_cast<uint8_t*>(mappedData.pData);
-        for (size_t i = 0; i < numInstances; ++i) {
-            size_t offset = i * internal::DrawCall::ConstantBufferSize;
-            const internal::DrawCall& call = queue->getDrawCalls()[i];
-
-            std::memcpy(dataPtr + offset, call.constantBufferData, internal::DrawCall::ConstantBufferSize);
-
-            // fill internal data structure
-            InternalData* idata = reinterpret_cast<InternalData*>(dataPtr + offset);
-
-            DXLogicalMeshBuffer* vertexBuffer = static_cast<DXLogicalMeshBuffer*>(call.vertexBuffer.value);
-            if (vertexBuffer != nullptr)
-                idata->vb = vertexBuffer->physicalAddress;
-
-            DXLogicalMeshBuffer* indexBuffer = static_cast<DXLogicalMeshBuffer*>(call.indexBuffer.value);
-            if (indexBuffer != nullptr)
-                idata->ib = indexBuffer->physicalAddress;
-
-            idata->drawCallType = call.type;
-            idata->count        = call.count;
-        }
-        g_pImmediateContext->Unmap(psimpl->constantBuffer.dataBuffer, 0);
+{{< highlight cpp >}}
+// update constants
+{
+    D3D11_MAPPED_SUBRESOURCE mappedData;
+    if (FAILED(g_pImmediateContext->Map(psimpl->constantBuffer.dataBuffer, 0, D3D11_MAP_WRITE_DISCARD,
+      0, &mappedData))) {
+        // TODO: error handling
+        return;
     }
+    uint8_t* dataPtr = reinterpret_cast<uint8_t*>(mappedData.pData);
+    for (size_t i = 0; i < numInstances; ++i) {
+        size_t offset = i * internal::DrawCall::ConstantBufferSize;
+        const internal::DrawCall& call = queue->getDrawCalls()[i];
+
+        std::memcpy(dataPtr + offset, call.constantBufferData, internal::DrawCall::ConstantBufferSize);
+
+        // fill internal data structure
+        InternalData* idata = reinterpret_cast<InternalData*>(dataPtr + offset);
+
+        DXLogicalMeshBuffer* vertexBuffer = static_cast<DXLogicalMeshBuffer*>(call.vertexBuffer.value);
+        if (vertexBuffer != nullptr)
+            idata->vb = vertexBuffer->physicalAddress;
+
+        DXLogicalMeshBuffer* indexBuffer = static_cast<DXLogicalMeshBuffer*>(call.indexBuffer.value);
+        if (indexBuffer != nullptr)
+            idata->ib = indexBuffer->physicalAddress;
+
+        idata->drawCallType = call.type;
+        idata->count        = call.count;
+    }
+    g_pImmediateContext->Unmap(psimpl->constantBuffer.dataBuffer, 0);
+}
+{{< /highlight >}}
 
 The data is now ready for actual rendering.
 
@@ -322,21 +333,22 @@ The data is now ready for actual rendering.
 
 Time for drawing! To render everything we need to set the buffers and issue DrawInstanced:
 
+{{< highlight cpp >}}
+ID3D11ShaderResourceView* vbibViews[2] = {
+    g_physicalVertexBuffer->physicalBufferView,
+    g_physicalIndexBuffer->physicalBufferView
+};
 
-    ID3D11ShaderResourceView* vbibViews[2] = {
-        g_physicalVertexBuffer->physicalBufferView,
-        g_physicalIndexBuffer->physicalBufferView
-    };
+g_pImmediateContext->VSSetShaderResources(0, 2, vbibViews);
 
-    g_pImmediateContext->VSSetShaderResources(0, 2, vbibViews);
+g_pImmediateContext->VSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
+g_pImmediateContext->HSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
+g_pImmediateContext->DSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
+g_pImmediateContext->GSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
+g_pImmediateContext->PSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
 
-    g_pImmediateContext->VSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
-    g_pImmediateContext->HSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
-    g_pImmediateContext->DSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
-    g_pImmediateContext->GSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
-    g_pImmediateContext->PSSetShaderResources(0 + 2, 1, &psimpl->constantBuffer.dataView);
-
-    g_pImmediateContext->DrawInstanced(maxDrawCallVertexCount, numInstances, 0, 0);
+g_pImmediateContext->DrawInstanced(maxDrawCallVertexCount, numInstances, 0, 0);
+{{< /highlight >}}
 
 Almost done. A few notes:
 
@@ -348,48 +360,50 @@ The vertex shader is also very simple.
 
 First we need to define all the CPU-side structured (vertex format, constant format, etc.):
 
+{{< highlight hlsl >}}
+// vertex
+struct VertexData
+{
+    float3 position;
+    float2 texcoord0;
+    float2 texcoord1;
+    float3 normal;
+};
+StructuredBuffer<VertexData> g_VertexBuffer;
+StructuredBuffer<uint>       g_IndexBuffer;
 
-    // vertex
-    struct VertexData
-    {
-        float3 position;
-        float2 texcoord0;
-        float2 texcoord1;
-        float3 normal;
-    };
-    StructuredBuffer<VertexData> g_VertexBuffer;
-    StructuredBuffer<uint>       g_IndexBuffer;
+// pipeline state
+#define DRAW 0
+#define DRAW_INDEXED 1
+struct ConstantData
+{
+    uint4    internalData;
 
-    // pipeline state
-    #define DRAW 0
-    #define DRAW_INDEXED 1
-    struct ConstantData
-    {
-        uint4    internalData;
-
-        float4x4 World;
-        float4x4 View;
-        float4x4 Projection;
-    };
-    StructuredBuffer<ConstantData> g_ConstantBuffer;
+    float4x4 World;
+    float4x4 View;
+    float4x4 Projection;
+};
+StructuredBuffer<ConstantData> g_ConstantBuffer;
+{{< /highlight >}}
 
 After that goes the code that fetches constant data and processes vertices (pay attention to indexed/non-indexed geometry handling):
 
+{{< highlight hlsl >}}
+uint instanceID = input.instanceID;
+uint vertexID   = input.vertexID;
 
-    uint instanceID = input.instanceID;
-    uint vertexID   = input.vertexID;
+uint vbID      = g_ConstantBuffer[instanceID].internalData[0];
+uint ibID      = g_ConstantBuffer[instanceID].internalData[1];
+uint drawType  = g_ConstantBuffer[instanceID].internalData[2];
+uint drawCount = g_ConstantBuffer[instanceID].internalData[3];
 
-    uint vbID      = g_ConstantBuffer[instanceID].internalData[0];
-    uint ibID      = g_ConstantBuffer[instanceID].internalData[1];
-    uint drawType  = g_ConstantBuffer[instanceID].internalData[2];
-    uint drawCount = g_ConstantBuffer[instanceID].internalData[3];
+VertexData vdata;
+[branch] if (drawType == DRAW_INDEXED) vdata = g_VertexBuffer[vbID + g_IndexBuffer[ibID + vertexID]];
+else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
 
-    VertexData vdata;
-    [branch] if (drawType == DRAW_INDEXED) vdata = g_VertexBuffer[vbID + g_IndexBuffer[ibID + vertexID]];
-    else     if (drawType == DRAW)         vdata = g_VertexBuffer[vbID + vertexID];
-
-    [flatten] if (vertexID > drawCount)
-        vdata = g_VertexOutsideClipPlane; // discard vertex by moving it outside of the clip plane
+[flatten] if (vertexID > drawCount)
+    vdata = g_VertexOutsideClipPlane; // discard vertex by moving it outside of the clip plane
+{{< /highlight >}}
 
 As you can see - there is no rocket science. [Full shader code for reference.](https://github.com/bazhenovc/sigrlinn/blob/master/shaders/dvp.hlsl)
 
