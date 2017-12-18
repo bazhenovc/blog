@@ -4,7 +4,7 @@ baseurl = "https://bazhenovc.github.io/blog/"
 disqusShortname = "bazhenovcsblog"
 theme = "hugo-dusk"
 paginate = 10
-canonifyurls = false
+canonifyurls = true
 copyright = "Copyright (c) 2017, all rights reserved."
 
 [author]
