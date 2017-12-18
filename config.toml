@@ -13,7 +13,7 @@ copyright = "Copyright (c) 2017, all rights reserved."
 SectionPagesMenu = "main"
 
 # use Chroma for syntax highlight
-PygmentsStyle = "vim" # other dark style options: vim, fruity, monokai
+PygmentsStyle = "monokai" # other dark style options: vim, fruity, monokai
 # enable syntax highlight for code blocks
 PygmentsCodeFences = true
 
