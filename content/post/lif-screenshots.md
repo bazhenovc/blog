@@ -11,12 +11,12 @@ I've spent a wonderful time working for BitBox as a graphics team leader and her
 
 Images (c) BitBox, Ltd.
 
-![lif_0](/lif_screens/lif_0)
-![lif_1](/lif_screens/lif_1)
-![lif_2](/lif_screens/lif_2)
-![lif_3](/lif_screens/lif_3)
-![lif_4](/lif_screens/lif_4)
-![lif_5](/lif_screens/lif_5)
-![lif_6](/lif_screens/lif_6)
-![lif_7](/lif_screens/lif_7)
-![lif_8](/lif_screens/lif_8)
+![lif_0](/lif_screens/lif_0.png)
+![lif_1](/lif_screens/lif_1.png)
+![lif_2](/lif_screens/lif_2.png)
+![lif_3](/lif_screens/lif_3.png)
+![lif_4](/lif_screens/lif_4.png)
+![lif_5](/lif_screens/lif_5.png)
+![lif_6](/lif_screens/lif_6.png)
+![lif_7](/lif_screens/lif_7.png)
+![lif_8](/lif_screens/lif_8.png)
