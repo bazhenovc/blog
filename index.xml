@@ -7,10 +7,21 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
     <copyright>Copyright (c) 2017, all rights reserved.</copyright>
-    <lastBuildDate>Fri, 15 Dec 2017 17:54:23 +0300</lastBuildDate>
+    <lastBuildDate>Thu, 11 Jan 2018 20:43:01 +0300</lastBuildDate>
     
 	<atom:link href="https://bazhenovc.github.io/blog/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>My favourite Life is Feudal screenshots</title>
+      <link>https://bazhenovc.github.io/blog/post/lif-screenshots/</link>
+      <pubDate>Thu, 11 Jan 2018 20:43:01 +0300</pubDate>
+      
+      <guid>https://bazhenovc.github.io/blog/post/lif-screenshots/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve spent a wonderful time working for BitBox as a graphics team leader and here are some of my favourite screenshots from this game.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
     
     <item>
       <title>Unordered Map Pitfall</title>

@@ -3,6 +3,11 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://bazhenovc.github.io/blog/post/lif-screenshots/</loc>
+    <lastmod>2018-01-11T20:43:01+03:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://bazhenovc.github.io/blog/post/unordered-map-pitfall/</loc>
     <lastmod>2017-12-15T17:54:23+03:00</lastmod>
   </url>
@@ -18,13 +23,13 @@
   </url>
   
   <url>
-    <loc>https://bazhenovc.github.io/blog/tags/c&#43;&#43;/</loc>
+    <loc>https://bazhenovc.github.io/blog/categories/c&#43;&#43;/</loc>
     <lastmod>2017-12-15T17:54:23+03:00</lastmod>
     <priority>0</priority>
   </url>
   
   <url>
-    <loc>https://bazhenovc.github.io/blog/categories/c&#43;&#43;/</loc>
+    <loc>https://bazhenovc.github.io/blog/tags/c&#43;&#43;/</loc>
     <lastmod>2017-12-15T17:54:23+03:00</lastmod>
     <priority>0</priority>
   </url>
@@ -49,7 +54,7 @@
   
   <url>
     <loc>https://bazhenovc.github.io/blog/categories/graphics/</loc>
-    <lastmod>2017-02-02T03:26:00+03:00</lastmod>
+    <lastmod>2018-01-11T20:43:01+03:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -61,7 +66,7 @@
   
   <url>
     <loc>https://bazhenovc.github.io/blog/post/</loc>
-    <lastmod>2017-12-15T17:54:23+03:00</lastmod>
+    <lastmod>2018-01-11T20:43:01+03:00</lastmod>
     <priority>0</priority>
   </url>
   
@@ -79,7 +84,7 @@
   
   <url>
     <loc>https://bazhenovc.github.io/blog/</loc>
-    <lastmod>2017-12-15T17:54:23+03:00</lastmod>
+    <lastmod>2018-01-11T20:43:01+03:00</lastmod>
     <priority>0</priority>
   </url>
   
