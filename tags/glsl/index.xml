@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Glsl on bazhenovc</title>
+    <link>https://bazhenovc.github.io/blog/tags/glsl/</link>
+    <description>Recent content in Glsl on bazhenovc</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <copyright>Copyright (c) 2017, all rights reserved.</copyright>
+    <lastBuildDate>Mon, 05 Feb 2018 23:09:58 +0300</lastBuildDate>
+    
+	<atom:link href="https://bazhenovc.github.io/blog/tags/glsl/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Randomized Texture Tiling</title>
+      <link>https://bazhenovc.github.io/blog/post/randomized-texture-tiling/</link>
+      <pubDate>Mon, 05 Feb 2018 23:09:58 +0300</pubDate>
+      
+      <guid>https://bazhenovc.github.io/blog/post/randomized-texture-tiling/</guid>
+      <description>&lt;p&gt;A quick and cheap way to generate unique texture patterns on the fly.&lt;/p&gt;
+
+&lt;p&gt;&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

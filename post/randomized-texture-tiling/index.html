@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+<head>
+<meta charset="utf-8" />
+<meta name="author" content="Kirill Bazhenov" />
+<meta name="description" content="Personal blog." />
+<meta name="keywords" content="blog, tech" />
+<meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+<meta name="generator" content="Hugo 0.31.1" />
+
+<link rel="canonical" href="https://bazhenovc.github.io/blog/post/randomized-texture-tiling/">
+<base href="https://bazhenovc.github.io/blog/" />
+<meta property="og:title" content="Randomized Texture Tiling" />
+<meta property="og:description" content="A quick and cheap way to generate unique texture patterns on the fly.
+
+" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://bazhenovc.github.io/blog/post/randomized-texture-tiling/" />
+
+
+
+<meta property="article:published_time" content="2018-02-05T23:09:58&#43;03:00"/>
+
+<meta property="article:modified_time" content="2018-02-05T23:09:58&#43;03:00"/>
+
+
+
+
+
+
+
+
+
+
+
+<meta name="twitter:card" content="summary"/><meta name="twitter:title" content="Randomized Texture Tiling"/>
+<meta name="twitter:description" content="A quick and cheap way to generate unique texture patterns on the fly.
+
+"/>
+
+
+
+<meta itemprop="name" content="Randomized Texture Tiling">
+<meta itemprop="description" content="A quick and cheap way to generate unique texture patterns on the fly.
+
+">
+
+
+<meta itemprop="datePublished" content="2018-02-05T23:09:58&#43;03:00" />
+<meta itemprop="dateModified" content="2018-02-05T23:09:58&#43;03:00" />
+<meta itemprop="wordCount" content="166">
+
+
+
+<meta itemprop="keywords" content="OpenGL,GLSL," />
+
+
+<link rel="stylesheet" href="css/layout.css" />
+<style type="text/css">
+body {
+  background-color: #101010;
+  color: #dbdbdb;
+}
+
+a { color: #dbdbdb; }
+
+pre {
+  background: #1D1F21;
+  border: 1px solid #dbdbdb;
+  border-radius: 5px;
+}
+
+code {
+  background: #1D1F21;
+}
+
+blockquote {
+  background: #1D1F21;
+  border-left: 3px solid #dbdbdb;
+}
+
+table {
+  margin: 1em auto;
+  border-collapse: collapse;
+}
+
+table, th, td {
+  border: 1px solid #dbdbdb;
+}
+
+th {
+  background: #dbdbdb;
+  color: #101010;
+}
+
+.siteTitle a { color: #99cc66; }
+
+.post .content h1{ color: #99cc66; }
+.post .content h2{ color: #99cc66; }
+.post .content h3{ color: #99cc66; }
+.post .content h4{ color: #99cc66; }
+.post .content h5{ color: #99cc66; }
+.post .content h6{ color: #99cc66; }
+.post .content a:hover { color: #99cc66; }
+.social-link:hover { color: #99cc66; }
+.nav-item-title:hover { color: #99cc66; }
+.tag a:hover { color: #99cc66; }
+.copyright { color: #404040 }
+.poweredby { color: #404040 }
+.poweredby a { color: #404040; }
+.post-preview .title a{ color: #99cc66; }
+.content-item a:hover{
+  text-decoration: underline;
+  color: #99cc66;
+}
+.post-list .title { color: #99cc66; }
+.rmore { color: #99cc66; }
+.terms .term a:hover {
+  text-decoration: underline;
+  color: #99cc66;
+}
+
+</style>
+
+
+<script>
+window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+ga('create', 'UA-111358204-1', 'auto');
+ga('send', 'pageview');
+</script>
+<script async src='//www.google-analytics.com/analytics.js'></script>
+
+
+<title>
+
+
+     Randomized Texture Tiling 
+
+</title>
+
+</head>
+
+
+<body>
+<div class="main">
+<header>
+
+<div class="header-bar">
+
+  <nav>
+    <div class="siteTitle">
+      <a href="https://bazhenovc.github.io/blog/">bazhenovc</a>
+    </div> 
+
+    
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/post/"><div class="nav-item-title">Posts</div></a>
+    
+    <a class="nav-item" href="https://bazhenovc.github.io/blog/tags/"><div class="nav-item-title">Tags</div></a>
+    
+
+  </nav>
+</div>
+
+  
+<div class="social-links-header">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">gh</div></a>
+  
+
+  
+
+  
+
+  
+
+</div>
+
+
+</header>
+
+
+<article class="post">
+    <h1 class="title"> Randomized Texture Tiling </h1>
+    <div class="content"> <p>A quick and cheap way to generate unique texture patterns on the fly.</p>
+
+<p></p>
+
+<h1 id="demo-source-code">Demo &amp; source code</h1>
+
+<p>The pixel shader below is very simple and self-explanatory: it uses artist-defined tile size and a random seed to generate a procedural UV coordinates.</p>
+
+<p>Sampling a texture using these UVs produces a continious unique pattern.</p>
+
+<script src="https://cdn.rawgit.com/gportelli/pocket.gl/v1.2.3/dist/pocket.gl.min.js"></script>
+<div id="WebGLContainer"></div>
+<script src="js/randomized-texture-tiling.js"></script>
+
+<p>Here&rsquo;s the GLSL reference function that is used in this demo:</p>
+
+<pre><code class="language-cpp">#define TILE_COUNT vec2(4, 4)   // hardcoded for the current texture
+                                // 256x256 tile size, 1024x1024 texture, 4x4 tiles
+vec2 getRandomizedTileUV(vec2 texCoord, float seed)
+{
+    vec2 tileID     = floor(texCoord * TILE_COUNT) / TILE_COUNT;
+    vec2 randomTile = floor(vec2(rand(tileID.yx, seed), rand(tileID.xy, seed)) * TILE_COUNT) / TILE_COUNT;
+    return texCoord - (tileID + randomTile);
+}
+</code></pre>
+
+<h1 id="credits">Credits</h1>
+
+<p>Pattern texture: <a href="https://opengameart.org/content/free-tilling-textures-pack-38">https://opengameart.org/content/free-tilling-textures-pack-38</a></p>
+
+<pre><code>Provided by Nobiax.
+CC0 1.0 Universal (CC0 1.0)
+Public Domain Dedication
+No Copyright
+This license is acceptable for Free Cultural Works
+</code></pre>
+
+<p>Demo uses PocketGL: <a href="http://pocket.gl">http://pocket.gl</a></p>
+
+<pre><code>This demo uses PocketGL
+A fully customizable webgl shader sandbox to embed in your pages
+Visit http://pocket.gl for the full documentation, examples and tutorials.
+</code></pre> </div>
+    <footer class="post-footer">
+
+  <div class="post-footer-data">
+    
+<div class="tags">
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/opengl">#OpenGL</a>
+      </div>
+    
+      <div class="tag">
+        <a href="https://bazhenovc.github.io/blog/tags/glsl">#GLSL</a>
+      </div>
+    
+</div>
+
+    <div class="date"> Feb 5, 2018 </div>
+  </div>
+
+</footer>
+
+
+  <div id="disqus_thread"></div>
+<script>
+    var disqus_config = function () {
+    
+    
+    
+    };
+    (function() {
+        if (["localhost", "127.0.0.1"].indexOf(window.location.hostname) != -1) {
+            document.getElementById('disqus_thread').innerHTML = 'Disqus comments not available by default when the website is previewed locally.';
+            return;
+        }
+        var d = document, s = d.createElement('script'); s.async = true;
+        s.src = '//' + "bazhenovcsblog" + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        (d.head || d.body).appendChild(s);
+    })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+<a href="https://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+
+</article>
+
+  <footer>
+
+  <div class="social-links-footer">
+
+  
+  <a href="mailto:bazhenovc@gmail.com"><div class="social-link">Email</div></a>
+  
+
+  
+  <a href="https://github.com/bazhenovc" target="_blank"><div class="social-link">GitHub</div></a>
+  
+
+  
+
+  
+
+  
+
+  <div class="social-link">
+  <a href="https://bazhenovc.github.io/blog/index.xml" target="_blank">RSS</a>
+  </div>
+
+</div>
+
+
+  <div class="copyright"> Copyright (c) 2017, all rights reserved. </div>
+
+  <div class="poweredby">
+    Powered by <a href="https://gohugo.io/">Hugo</a>.
+  </div>
+
+  </footer>
+
+</div> 
+
+</body>
+</html>
+
