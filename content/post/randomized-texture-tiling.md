@@ -18,7 +18,7 @@ A quick and cheap way to generate unique texture patterns on the fly.
 
 The pixel shader below is very simple and self-explanatory: it uses artist-defined tile size and a random seed to generate a procedural UV coordinates.
 
-Sampling a texture using these UVs produces a continious unique pattern.
+Sampling a texture using these UVs produces a continuous unique pattern.
 
 <script src="https://cdn.rawgit.com/gportelli/pocket.gl/v1.2.3/dist/pocket.gl.min.js"></script>
 <div id="WebGLContainer"></div>
