@@ -32,8 +32,7 @@ vec2 getRandomizedTileUV(vec2 texCoord, float seed)
 
 void main(void)
 {
-    float aspectRatio = resolution.x / resolution.y;
-    vec2 texCoord = (gl_FragCoord.xy / resolution) * vec2(UniformScale, UniformScale) * aspectRatio;
+    vec2 texCoord = (gl_FragCoord.xy / resolution) * vec2(UniformScale, UniformScale);
 
     vec2 patternUV = getRandomizedTileUV(texCoord, RandomSeed);
 
