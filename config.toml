@@ -1,7 +1,6 @@
 languageCode = "en-us"
 title = "bazhenovc"
 baseurl = "https://bazhenovc.github.io/blog/"
-disqusShortname = "bazhenovcsblog"
 googleAnalytics = "UA-111358204-1"
 theme = "hugo-dusk"
 paginate = 10
